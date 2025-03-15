@@ -1,0 +1,23 @@
+{
+    "name": "RepeatRiff",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "type": "module",
+    "devDependencies": {
+        "@types/chrome": "^0.0.306",
+        "@types/node": "^22.13.5",
+        "chalk": "^5.4.1",
+        "chokidar": "^4.0.3",
+        "http-server": "^14.1.1",
+        "typescript": "^5.7.3",
+        "ws": "^8.18.1"
+    },
+    "dependencies": {},
+    "scripts": {
+        "dev": "node ./tools/runDev.js",
+        "build": "tsc && ./scripts/copyStatic.sh",
+        "watch": "tsc --watch",
+        "clean": "rm -rf build/*"
+    }
+}
