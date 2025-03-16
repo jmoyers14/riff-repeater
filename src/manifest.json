@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Repeat Riff",
+    "name": "Riff Repeater",
     "version": "1.0.0",
     "description": "Repeat YouTube videos",
     "permissions": ["activeTab", "storage", "scripting"],
