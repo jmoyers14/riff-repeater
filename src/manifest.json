@@ -5,7 +5,7 @@
     "description": "Repeat YouTube videos",
     "permissions": ["activeTab", "storage", "scripting"],
     "action": {
-        "default_popup": "popup/popup.html"
+        "default_popup": "popup.html"
     },
     "content_scripts": [
         {

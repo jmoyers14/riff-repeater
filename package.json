@@ -9,15 +9,21 @@
         "@types/node": "^22.13.5",
         "chalk": "^5.4.1",
         "chokidar": "^4.0.3",
+        "copy-webpack-plugin": "^13.0.0",
         "http-server": "^14.1.1",
+        "ts-loader": "^9.5.2",
         "typescript": "^5.7.3",
+        "webpack": "^5.98.0",
+        "webpack-cli": "^6.0.1",
         "ws": "^8.18.1"
     },
-    "dependencies": {},
+    "dependencies": {
+        "preact": "^10.26.4"
+    },
     "scripts": {
         "dev": "node ./tools/runDev.js",
-        "build": "tsc && ./scripts/copyStatic.sh",
-        "watch": "tsc --watch",
+        "build": "webpack --config webpack.config.js",
+        "watch": "webpack --watch --config webpack.config.js",
         "clean": "rm -rf build/*"
     }
 }
