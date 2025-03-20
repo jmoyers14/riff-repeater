@@ -1,4 +1,4 @@
-import { h, render, Fragment } from "preact";
+import { h } from "preact";
 import { Mark } from "../types";
 import { formatTime } from "../utils/formatTime";
 
@@ -8,7 +8,7 @@ interface BookmarkItemProps {
     onJump: (time: number) => void;
 }
 
-export const BookmarkItem = ({ mark, onDelete, onJump }: BookmarkItemProps) => {
+export const MarkItem = ({ mark, onDelete, onJump }: BookmarkItemProps) => {
     const { hotkey, name, time } = mark;
 
     return (
