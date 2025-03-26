@@ -4,7 +4,7 @@ import { formatTime } from "../utils/formatTime";
 
 interface BookmarkItemProps {
     mark: Mark;
-    onDelete: (hotkey: string) => void;
+    onDelete: (mark: Mark) => void;
     onJump: (time: number) => void;
 }
 
@@ -28,7 +28,7 @@ export const MarkItem = ({ mark, onDelete, onJump }: BookmarkItemProps) => {
                 </button>
                 <button
                     className="delete-bookmark"
-                    onClick={() => onDelete(hotkey)}
+                    onClick={() => onDelete(mark)}
                     title="Delete bookmark"
                 >
                     ×

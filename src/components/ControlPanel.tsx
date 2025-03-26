@@ -1,84 +1,32 @@
 import { h } from "preact";
-import { useState, useEffect, useRef } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { AddMarkForm } from "./AddMarkForm";
 import { Mark } from "../types";
 import { MarkItem } from "./MarkItem";
-import { MarksRepositroy } from "../marksRepository/marksRepository";
-import { ChromeStorageMarksRepository } from "../marksRepository/chromeStorageMarksRepository";
 
 interface ControlPanelProps {
     videoId?: string;
+    marks: Record<string, Mark>;
+    onAddMark: (mark: Mark, videoId?: string) => Promise<void>;
+    onDeleteMark: (mark: Mark, videoId?: string) => Promise<void>;
 }
 
-const marksRepository: MarksRepositroy = new ChromeStorageMarksRepository();
-
-const groupByHotkey = (marks: Mark[]): Record<string, Mark> => {
-    return marks.reduce(
-        (acc, curr) => {
-            acc[curr.hotkey] = curr;
-            return acc;
-        },
-        {} as Record<string, Mark>
-    );
-};
-
 export const ControlPanel = (props: ControlPanelProps) => {
-    const [marks, setMarks] = useState<Record<string, Mark>>({});
     const [showAddDialog, setShowAddDialog] = useState(false);
 
-    useEffect(() => {
-        const { videoId } = props;
-        if (videoId) {
-            loadMarks(videoId);
-        }
-    }, []);
-
-    const loadMarks = async (videoId: string) => {
-        try {
-            const loadedMarks = await marksRepository.getMarks(videoId);
-            const groupedMarks = groupByHotkey(loadedMarks);
-            setMarks(groupedMarks);
-        } catch (error) {
-            console.error("Error loading marks:", error);
-        }
-    };
+    const { onAddMark, onDeleteMark, marks, videoId } = props;
 
     const handleAddMark = () => {
         setShowAddDialog(true);
     };
 
     const handleSubmitMark = async (mark: Mark) => {
-        /*
-        setMarks((prev) => ({
-            ...prev,
-            [mark.hotkey]: mark,
-        }));
-
-        marksMap[mark.hotkey] = mark;
-
-        const videoId = videoIdRef.current;
-        if (videoId) {
-            await marksRepository.addMark(videoId, mark);
-        }
-
+        await onAddMark(mark, videoId);
         setShowAddDialog(false);
-        */
     };
 
-    const handleDeleteMark = async (hotkey: string) => {
-        /*
-        const newMarks = { ...marks };
-        const deletedMark = newMarks[hotkey];
-        delete newMarks[hotkey];
-        setMarks(newMarks);
-
-        delete marksMap[hotkey];
-
-        const videoId = videoIdRef.current;
-        if (videoId && deletedMark) {
-            await marksRepository.removeMark(videoId, deletedMark);
-        }
-        */
+    const handleDeleteMark = async (mark: Mark) => {
+        return onDeleteMark(mark, videoId);
     };
 
     return (
