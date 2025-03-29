@@ -1,5 +1,6 @@
 import { groupMarksByHotkey } from "./utils/groupMarksByHotkey";
 import { h, render } from "preact";
+import { jumpToTime } from "./utils/videoPlayer";
 import { waitForElement } from "./utils/waitForElement";
 import { ChromeStorageMarksRepository } from "./marksRepository/chromeStorageMarksRepository";
 import { ControlPanel } from "./components/ControlPanel";
@@ -7,7 +8,6 @@ import { Mark } from "./types";
 import { MarksRepositroy } from "./marksRepository/marksRepository";
 
 const ROOT_ID = "yt-practice-root";
-const VIDEO_SELECTOR = "video";
 const ABOVE_THE_FOLD_SELECTOR = "#above-the-fold";
 
 const marksRepository: MarksRepositroy = new ChromeStorageMarksRepository();
@@ -73,7 +73,7 @@ const init = async () => {
     await waitForElement(ABOVE_THE_FOLD_SELECTOR);
 
     if (videoId) {
-        loadMarks(videoId);
+        await loadMarks(videoId);
     }
 
     const playerContainer = document.querySelector(ABOVE_THE_FOLD_SELECTOR);
@@ -91,12 +91,6 @@ window.addEventListener("load", init);
 
 document.addEventListener("keydown", (event) => {
     console.log(`keydown: ${event.key}`);
-    const video = document.querySelector("video");
-    if (!video) {
-        console.log("Video not found.");
-        return;
-    }
-
     const mark = marks[event.key];
 
     if (!mark) {
@@ -106,20 +100,3 @@ document.addEventListener("keydown", (event) => {
 
     jumpToTime(mark.time);
 });
-
-const getVideoPlayer = (): HTMLVideoElement | null => {
-    const video = document.querySelector(VIDEO_SELECTOR);
-    if (!video) {
-        console.log("video not found");
-    }
-    return video;
-};
-
-const jumpToTime = (time: number) => {
-    const video = getVideoPlayer();
-    if (!video) {
-        return;
-    }
-    console.log(`jumping to time ${time}`);
-    video.currentTime = time;
-};

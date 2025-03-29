@@ -1,22 +1,23 @@
 import { h } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
+import "../styles.css";
 
 import { Mark } from "../types";
 
+export type AddMarkFormValues = Partial<Mark>;
+
 interface AddMarkFormProps {
-    initialTime: number;
+    initialValues: Partial<Mark>;
     onSubmit: (mark: Mark) => void;
     onCancel: () => void;
 }
 
-export const AddMarkForm = ({
-    initialTime,
-    onSubmit,
-    onCancel,
-}: AddMarkFormProps) => {
-    const [name, setName] = useState("");
-    const [hotkey, setHotkey] = useState("");
-    const [time, setTime] = useState(initialTime);
+export const AddMarkForm = (props: AddMarkFormProps) => {
+    const { initialValues, onCancel, onSubmit } = props;
+    const [name, setName] = useState(initialValues.name);
+    const [hotkey, setHotkey] = useState(initialValues.hotkey);
+    const [time, setTime] = useState(initialValues.time);
+
     const nameInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -29,8 +30,18 @@ export const AddMarkForm = ({
     const handleSubmit = (e: Event) => {
         e.preventDefault();
 
-        if (hotkey.length !== 1) {
+        if (!hotkey) {
             alert("Please enter a single character as the hotkey");
+            return;
+        }
+
+        if (!name) {
+            alert("Please enter a name");
+            return;
+        }
+
+        if (!time) {
+            alert("Please enter a time");
             return;
         }
 

@@ -1,0 +1,133 @@
+<html>
+    <head>
+        <style>
+            .rounded-box {
+                border: 2px solid #209fb5; /* sapphire */
+                border-radius: 10px;
+                padding: 16px;
+                width: 400px;
+                margin: 20px;
+                background-color: #eff1f5; /* base */
+                position: relative;
+            }
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .title {
+                color: #4c4f69; /* text */
+                margin: 0px;
+                font-size: 1.2em;
+                font-weight: bold;
+                font-family: ariel, sans-serif;
+            }
+            .add-button {
+                background-color: none;
+                border: none;
+                margin: 0;
+                cursor: pointer;
+                padding: 0;
+                display: flex;
+                align-items: center;
+            }
+            .add-button img {
+                width: 24px;
+                height: 24px;
+                filter: invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg)
+                    brightness(96%) contrast(89%); /* Approximates #40a02b */
+            }
+            .add-button:hover img {
+                filter: invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg)
+                    brightness(91%) contrast(95%); /* Approximates #179299 */
+            }
+            .bookmark-items-container {
+                margin-top: 12px;
+            }
+            .bookmark-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-top: 8px;
+            }
+            .bookmark-item:first-child {
+                margin-top: 0;
+            }
+            .hotkey {
+                border: 1px solid #bcc0cc;
+                font-family: ariel;
+                background-color: #e6e9ef; /* mantle */
+                color: #8839ef; /* mauve */
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-weight: bold;
+                min-width: 20px;
+                text-align: center;
+            }
+            .bookmark-name {
+                font-family: ariel, sans-serif;
+                color: #4c4f69; /* text */
+                flex-grow: 1;
+            }
+            .timestamp {
+                color: #1e66f5; /* blue */
+                font-family: monospace;
+                margin-right: 12px;
+            }
+            .edit-button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0;
+                display: flex;
+                align-items: center;
+            }
+            .edit-button img {
+                width: 20px;
+                height: 20px;
+                filter: invert(57%) sepia(86%) saturate(1921%)
+                    hue-rotate(203deg) brightness(101%) contrast(96%); /* Approximates #7287fd */
+            }
+            .edit-button:hover img {
+                filter: invert(42%) sepia(99%) saturate(7404%)
+                    hue-rotate(256deg) brightness(101%) contrast(98%); /* Approximates #8839ef */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="rounded-box">
+            <div class="header-container">
+                <h1 class="title">Riff Repeater</h1>
+                <button class="add-button">
+                    <img src="icons/plus-circle.svg" alt="Add" />
+                </button>
+            </div>
+            <div class="bookmark-items-container">
+                <div class="bookmark-item">
+                    <span class="hotkey">I</span>
+                    <span class="bookmark-name">Intro Riff</span>
+                    <span class="timestamp">0:50</span>
+                    <button class="edit-button">
+                        <img src="icons/edit.svg" alt="Edit" />
+                    </button>
+                </div>
+                <div class="bookmark-item">
+                    <span class="hotkey">C</span>
+                    <span class="bookmark-name">Chorus</span>
+                    <span class="timestamp">14:50</span>
+                    <button class="edit-button">
+                        <img src="icons/edit.svg" alt="Edit" />
+                    </button>
+                </div>
+                <div class="bookmark-item">
+                    <span class="hotkey">S</span>
+                    <span class="bookmark-name">Guitar Solo</span>
+                    <span class="timestamp">20:00</span>
+                    <button class="edit-button">
+                        <img src="icons/edit.svg" alt="Edit" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

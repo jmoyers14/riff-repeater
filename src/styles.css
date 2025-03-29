@@ -1,118 +1,97 @@
-/* Control panel container */
-.yt-practice-control-panel {
-    background-color: #282828;
-    color: #fff;
-    border-radius: 4px;
-    margin: 10px 0;
-    padding: 12px;
-    font-family: Roboto, Arial, sans-serif;
-    max-width: 800px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+.yt-control-panel {
+    border: 2px solid #209fb5; /* sapphire */
+    border-radius: 10px;
+    padding: 16px;
+    background-color: #eff1f5; /* base */
+    margin: 16px 0px;
 }
-
-/* Panel header */
 .panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #3f3f3f;
-    padding-bottom: 8px;
+    margin-bottom: 12px;
 }
-
-.panel-header h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 500;
+.title {
+    color: #4c4f69; /* text */
+    margin: 0px;
+    font-size: 1.8em;
+    font-weight: bold;
+    font-family: ariel, sans-serif;
 }
-
-/* Add bookmark button */
-#add-bookmark-btn {
-    background-color: #cc0000;
-    color: white;
+.add-button {
+    background-color: none;
     border: none;
-    border-radius: 2px;
-    padding: 8px 12px;
-    font-size: 14px;
+    margin: 0;
     cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-#add-bookmark-btn:hover {
-    background-color: #ff0000;
-}
-
-/* Bookmarks container */
-#bookmarks-container {
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-/* Individual bookmark */
-.bookmark-item {
+    padding: 0;
     display: flex;
     align-items: center;
-    padding: 8px 10px;
-    margin: 4px 0;
-    background-color: #3f3f3f;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: background-color 0.2s;
 }
-
-.bookmark-item:hover {
-    background-color: #505050;
+.add-button img {
+    width: 24px;
+    height: 24px;
+    filter: invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg)
+        brightness(96%) contrast(89%); /* Approximates #40a02b */
 }
-
-/* Bookmark elements */
-.bookmark-key {
-    background-color: #cc0000;
-    color: white;
-    border-radius: 2px;
-    padding: 2px 6px;
-    margin-right: 10px;
+.add-button:hover img {
+    filter: invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg)
+        brightness(91%) contrast(95%); /* Approximates #179299 */
+}
+.marks-container {
+    margin-top: 24px;
+}
+.mark-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+.mark-item:first-child {
+    margin-top: 0;
+}
+.mark-hotkey {
+    border: 1px solid #bcc0cc;
+    font-family: ariel, serif;
+    background-color: #e6e9ef; /* mantle */
+    color: #8839ef; /* mauve */
+    padding: 4px;
+    border-radius: 6px;
     font-weight: bold;
-    font-size: 12px;
-    min-width: 14px;
+    width: 24px;
+    height: 24px;
     text-align: center;
+    font-size: 1.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
-.bookmark-time {
-    margin-right: 10px;
-    color: #aaa;
-    font-size: 13px;
-    min-width: 40px;
-}
-
-.bookmark-label {
+.mark-name {
+    font-family: ariel, sans-serif;
+    color: #4c4f69; /* text */
     flex-grow: 1;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.2em;
 }
-
-/* Delete bookmark button */
-.delete-bookmark {
+.mark-timestamp {
+    color: #1e66f5; /* blue */
+    font-family: ariel, sans-serif;
+    margin-right: 12px;
+    font-size: 1.2em;
+}
+.edit-button {
     background: none;
     border: none;
-    color: #aaa;
-    font-size: 18px;
     cursor: pointer;
-    padding: 0 4px;
-    margin-left: 8px;
-    opacity: 0.6;
+    padding: 0;
+    display: flex;
+    align-items: center;
 }
-
-.delete-bookmark:hover {
-    opacity: 1;
-    color: #fff;
+.edit-button img {
+    width: 20px;
+    height: 20px;
+    filter: invert(57%) sepia(86%) saturate(1921%) hue-rotate(203deg)
+        brightness(101%) contrast(96%); /* Approximates #7287fd */
 }
-
-/* Empty state */
-.no-bookmarks {
-    color: #aaa;
-    font-style: italic;
-    text-align: center;
-    padding: 10px;
+.edit-button:hover img {
+    filter: invert(42%) sepia(99%) saturate(7404%) hue-rotate(256deg)
+        brightness(101%) contrast(98%); /* Approximates #8839ef */
 }
