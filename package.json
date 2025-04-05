@@ -6,13 +6,17 @@
     "type": "module",
     "devDependencies": {
         "@types/chrome": "^0.0.306",
+        "@types/jest": "^29.5.14",
         "@types/node": "^22.13.5",
         "chalk": "^5.4.1",
         "chokidar": "^4.0.3",
         "copy-webpack-plugin": "^13.0.0",
         "css-loader": "^7.1.2",
         "http-server": "^14.1.1",
+        "jest": "^29.7.0",
+        "jest-environment-jsdom": "^29.7.0",
         "style-loader": "^4.0.0",
+        "ts-jest": "^29.3.1",
         "ts-loader": "^9.5.2",
         "typescript": "^5.7.3",
         "webpack": "^5.98.0",
@@ -26,6 +30,7 @@
         "dev": "node ./tools/runDev.js",
         "build": "webpack --config webpack.config.js",
         "watch": "webpack --watch --config webpack.config.js",
-        "clean": "rm -rf build/*"
+        "clean": "rm -rf build/*",
+        "test": "jest"
     }
 }

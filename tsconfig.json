@@ -11,8 +11,9 @@
         "moduleResolution": "node",
         "jsx": "react",
         "jsxFactory": "h",
-        "jsxFragmentFactory": "Fragment"
+        "jsxFragmentFactory": "Fragment",
+        "types": ["jest", "node"]
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "__tests__/**/*"],
     "exclude": ["node_modules"]
 }
