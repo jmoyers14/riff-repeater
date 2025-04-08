@@ -1,6 +1,7 @@
 import { h } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
 import "../styles.css";
+import { DurationInput } from "./DurationInput";
 
 import { Mark } from "../types";
 
@@ -21,7 +22,6 @@ export const AddMarkForm = (props: AddMarkFormProps) => {
     const nameInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Focus the name input when the form appears
         if (nameInputRef.current) {
             nameInputRef.current.focus();
         }
@@ -87,17 +87,9 @@ export const AddMarkForm = (props: AddMarkFormProps) => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="bookmark-time">Time (seconds):</label>
-                        <input
-                            type="number"
+                        <DurationInput
                             id="bookmark-time"
                             value={time}
-                            onInput={(e) =>
-                                setTime(
-                                    parseInt(
-                                        (e.target as HTMLInputElement).value
-                                    )
-                                )
-                            }
                             required
                         />
                     </div>
