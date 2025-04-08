@@ -1,6 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import CopyPlugin from "copy-webpack-plugin";
+import { options } from "preact";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,8 +22,13 @@ export default {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: "ts-loader",
-                exclude: /node_modules/,
+                use: {
+                    loader: "ts-loader",
+                    options: {
+                        onlyCompileBundledFiles: true,
+                    },
+                },
+                exclude: [/node_modules/, /__tests__/],
             },
             {
                 test: /\.css$/,

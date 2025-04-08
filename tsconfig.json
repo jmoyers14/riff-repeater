@@ -12,8 +12,8 @@
         "jsx": "react",
         "jsxFactory": "h",
         "jsxFragmentFactory": "Fragment",
-        "types": ["jest", "node"]
+        "types": ["chrome", "jest", "node"]
     },
     "include": ["src/**/*", "__tests__/**/*"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "__tests__"]
 }
