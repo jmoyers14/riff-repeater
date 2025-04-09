@@ -37,19 +37,19 @@
     filter: invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg)
         brightness(91%) contrast(95%); /* Approximates #179299 */
 }
-.marks-container {
+.riffs-container {
     margin-top: 24px;
 }
-.mark-item {
+.riff-item {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-top: 8px;
 }
-.mark-item:first-child {
+.riff-item:first-child {
     margin-top: 0;
 }
-.mark-hotkey {
+.riff-hotkey {
     border: 1px solid #bcc0cc;
     font-family: ariel, serif;
     background-color: #e6e9ef; /* mantle */
@@ -65,13 +65,13 @@
     align-items: center;
     justify-content: center;
 }
-.mark-name {
+.riff-name {
     font-family: ariel, sans-serif;
     color: #4c4f69; /* text */
     flex-grow: 1;
     font-size: 1.2em;
 }
-.mark-timestamp {
+.riff-timestamp {
     color: #1e66f5; /* blue */
     font-family: ariel, sans-serif;
     margin-right: 12px;

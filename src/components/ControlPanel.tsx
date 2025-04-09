@@ -1,9 +1,9 @@
 import { getCurrentTime } from "../utils/videoPlayer";
 import { h } from "preact";
 import { useState } from "preact/hooks";
-import { AddMarkForm, AddMarkFormValues } from "./AddMarkForm";
-import { Mark } from "../types";
-import { MarkItem } from "./MarkItem";
+import { AddRiffForm, AddRiffFormValues } from "./AddRiffForm";
+import { Riff } from "../types";
+import { RiffItem } from "./RiffItem";
 import "../styles.css";
 import "../assets/plus-circle.svg";
 
@@ -11,68 +11,68 @@ const addSvg = chrome.runtime.getURL("assets/plus-circle.svg");
 
 interface ControlPanelProps {
     videoId?: string;
-    marks: Record<string, Mark>;
-    onAddMark: (mark: Mark, videoId?: string) => Promise<void>;
-    onDeleteMark: (mark: Mark, videoId?: string) => Promise<void>;
+    riffs: Record<string, Riff>;
+    onAddRiff: (riff: Riff, videoId?: string) => Promise<void>;
+    onDeleteRiff: (riff: Riff, videoId?: string) => Promise<void>;
 }
 
 export const ControlPanel = (props: ControlPanelProps) => {
-    const [selectedMark, setSelectedMark] = useState<
-        AddMarkFormValues | undefined
+    const [selectedRiff, setSelectedRiff] = useState<
+        AddRiffFormValues | undefined
     >(undefined);
 
-    const { onAddMark, onDeleteMark, marks, videoId } = props;
+    const { onAddRiff, onDeleteRiff, riffs, videoId } = props;
 
-    const handleAddMark = () => {
-        const newMark: AddMarkFormValues = {
+    const handleAddRiff = () => {
+        const newRiff: AddRiffFormValues = {
             time: getCurrentTime() ?? 0,
         };
-        setSelectedMark(newMark);
+        setSelectedRiff(newRiff);
     };
 
-    const handleDeleteMark = async (mark: Mark) => {
-        return onDeleteMark(mark, videoId);
+    const handleDeleteRiff = async (riff: Riff) => {
+        return onDeleteRiff(riff, videoId);
     };
 
-    const handleEditMark = async (mark: Mark) => {
-        setSelectedMark(mark);
+    const handleEditRiff = async (riff: Riff) => {
+        setSelectedRiff(riff);
     };
 
-    const handleSubmitMark = async (mark: Mark) => {
-        await onAddMark(mark, videoId);
-        setSelectedMark(undefined);
+    const handleSubmitRiff = async (riff: Riff) => {
+        await onAddRiff(riff, videoId);
+        setSelectedRiff(undefined);
     };
 
     return (
         <div className="yt-control-panel">
             <div className="panel-header">
                 <h1 className="title">Riff Reapeter</h1>
-                <button className="add-button" onClick={handleAddMark}>
+                <button className="add-button" onClick={handleAddRiff}>
                     <img src={addSvg} alt="Add" />
                 </button>
             </div>
-            <div className="marks-container">
-                {Object.values(marks).map((mark) => (
-                    <MarkItem
-                        key={mark.hotkey}
-                        mark={mark}
-                        onDelete={handleDeleteMark}
-                        onEdit={handleEditMark}
+            <div className="riffs-container">
+                {Object.values(riffs).map((riff) => (
+                    <RiffItem
+                        key={riff.hotkey}
+                        riff={riff}
+                        onDelete={handleDeleteRiff}
+                        onEdit={handleEditRiff}
                         onJump={() => {}}
                     />
                 ))}
             </div>
 
-            {selectedMark && (
-                <AddMarkForm
-                    initialValues={selectedMark}
-                    onSubmit={handleSubmitMark}
-                    onCancel={() => setSelectedMark(undefined)}
+            {selectedRiff && (
+                <AddRiffForm
+                    initialValues={selectedRiff}
+                    onSubmit={handleSubmitRiff}
+                    onCancel={() => setSelectedRiff(undefined)}
                 />
             )}
 
             <style>{`
-                .bookmark-dialog {
+                .bookriff-dialog {
                     position: fixed;
                     top: 0;
                     left: 0;
@@ -84,7 +84,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
                     align-items: center;
                     z-index: 9999;
                 }
-                .bookmark-dialog-content {
+                .bookriff-dialog-content {
                     background: #2f2f2f;
                     padding: 20px;
                     border-radius: 8px;
