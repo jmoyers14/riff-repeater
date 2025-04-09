@@ -72,7 +72,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
             )}
 
             <style>{`
-                .bookriff-dialog {
+                .riff-dialog {
                     position: fixed;
                     top: 0;
                     left: 0;

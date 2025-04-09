@@ -53,15 +53,15 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
     };
 
     return (
-        <div className="bookriff-dialog">
-            <div className="bookriff-dialog-content">
+        <div className="riff-dialog">
+            <div className="riff-dialog-content">
                 <h3>Add New Bookriff</h3>
-                <form id="bookriff-form" onSubmit={handleSubmit}>
+                <form id="riff-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="bookriff-name">Name:</label>
+                        <label htmlFor="riff-name">Name:</label>
                         <input
                             type="text"
-                            id="bookriff-name"
+                            id="riff-name"
                             ref={nameInputRef}
                             value={name}
                             onInput={(e) =>
@@ -71,12 +71,12 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="bookriff-hotkey">
+                        <label htmlFor="riff-hotkey">
                             Hotkey (single character):
                         </label>
                         <input
                             type="text"
-                            id="bookriff-hotkey"
+                            id="riff-hotkey"
                             maxLength={1}
                             value={hotkey}
                             onInput={(e) =>
@@ -86,9 +86,9 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="bookriff-time">Time (seconds):</label>
+                        <label htmlFor="riff-time">Time (seconds):</label>
                         <DurationInput
-                            id="bookriff-time"
+                            id="riff-time"
                             value={time}
                             required
                         />
@@ -97,7 +97,7 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
                         <button type="submit">Save</button>
                         <button
                             type="button"
-                            id="cancel-bookriff"
+                            id="cancel-riff"
                             onClick={onCancel}
                         >
                             Cancel

@@ -5,14 +5,14 @@ import "../assets/edit.svg";
 
 const editSvg = chrome.runtime.getURL("assets/edit.svg");
 
-interface BookriffItemProps {
+interface RiffItemProps {
     riff: Riff;
     onDelete: (riff: Riff) => void;
     onEdit: (riff: Riff) => void;
     onJump: (time: number) => void;
 }
 
-export const RiffItem = (props: BookriffItemProps) => {
+export const RiffItem = (props: RiffItemProps) => {
     const { riff, onDelete, onEdit, onJump } = props;
 
     const { hotkey, name, time } = riff;
