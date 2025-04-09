@@ -1,42 +1,42 @@
-import { groupMarksByHotkey } from "./utils/groupMarksByHotkey";
+import { groupRiffsByHotkey } from "./utils/groupRiffsByHotkey";
 import { h, render } from "preact";
 import { jumpToTime } from "./utils/videoPlayer";
 import { waitForElement } from "./utils/waitForElement";
-import { ChromeStorageMarksRepository } from "./marksRepository/chromeStorageMarksRepository";
+import { ChromeStorageRiffsRepository } from "./riffsRepository/chromeStorageRiffsRepository";
 import { ControlPanel } from "./components/ControlPanel";
-import { Mark } from "./types";
-import { MarksRepositroy } from "./marksRepository/marksRepository";
+import { Riff } from "./types";
+import { RiffsRepositroy } from "./riffsRepository/riffsRepository";
 
 const ROOT_ID = "yt-practice-root";
 const ABOVE_THE_FOLD_SELECTOR = "#above-the-fold";
 
-const marksRepository: MarksRepositroy = new ChromeStorageMarksRepository();
+const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
 
-let marks: Record<string, Mark> = {};
+let riffs: Record<string, Riff> = {};
 
 let rootContainer: HTMLDivElement | null = null;
 
-const loadMarks = async (videoId: string) => {
+const loadRiffs = async (videoId: string) => {
     try {
-        const loadedMarks = await marksRepository.getMarks(videoId);
-        marks = groupMarksByHotkey(loadedMarks);
+        const loadedRiffs = await riffsRepository.getRiffs(videoId);
+        riffs = groupRiffsByHotkey(loadedRiffs);
     } catch (error) {
-        console.error("Error loading marks:", error);
+        console.error("Error loading riffs:", error);
     }
 };
 
-const handleAddMark = async (mark: Mark, videoId?: string) => {
-    marks[mark.hotkey] = mark;
+const handleAddRiff = async (riff: Riff, videoId?: string) => {
+    riffs[riff.hotkey] = riff;
     if (videoId) {
-        await marksRepository.addMark(videoId, mark);
+        await riffsRepository.addRiff(videoId, riff);
     }
     renderControlPanel(videoId);
 };
 
-const handleDeleteMark = async (mark: Mark, videoId?: string) => {
-    delete marks[mark.hotkey];
+const handleDeleteRiff = async (riff: Riff, videoId?: string) => {
+    delete riffs[riff.hotkey];
     if (videoId) {
-        await marksRepository.deleteMark(videoId, mark);
+        await riffsRepository.deleteRiff(videoId, riff);
     }
 };
 
@@ -55,9 +55,9 @@ const renderControlPanel = (videoId: string | undefined) => {
     render(
         <ControlPanel
             videoId={videoId}
-            marks={marks}
-            onAddMark={handleAddMark}
-            onDeleteMark={handleDeleteMark}
+            riffs={riffs}
+            onAddRiff={handleAddRiff}
+            onDeleteRiff={handleDeleteRiff}
         />,
         rootContainer
     );
@@ -73,7 +73,7 @@ const init = async () => {
     await waitForElement(ABOVE_THE_FOLD_SELECTOR);
 
     if (videoId) {
-        await loadMarks(videoId);
+        await loadRiffs(videoId);
     }
 
     const playerContainer = document.querySelector(ABOVE_THE_FOLD_SELECTOR);
@@ -91,12 +91,12 @@ window.addEventListener("load", init);
 
 document.addEventListener("keydown", (event) => {
     console.log(`keydown: ${event.key}`);
-    const mark = marks[event.key];
+    const riff = riffs[event.key];
 
-    if (!mark) {
+    if (!riff) {
         console.log(`no event found for ${event.key}`);
         return;
     }
 
-    jumpToTime(mark.time);
+    jumpToTime(riff.time);
 });

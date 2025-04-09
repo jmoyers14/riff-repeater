@@ -3,17 +3,17 @@ import { useState, useEffect, useRef } from "preact/hooks";
 import "../styles.css";
 import { DurationInput } from "./DurationInput";
 
-import { Mark } from "../types";
+import { Riff } from "../types";
 
-export type AddMarkFormValues = Partial<Mark>;
+export type AddRiffFormValues = Partial<Riff>;
 
-interface AddMarkFormProps {
-    initialValues: Partial<Mark>;
-    onSubmit: (mark: Mark) => void;
+interface AddRiffFormProps {
+    initialValues: Partial<Riff>;
+    onSubmit: (riff: Riff) => void;
     onCancel: () => void;
 }
 
-export const AddMarkForm = (props: AddMarkFormProps) => {
+export const AddRiffForm = (props: AddRiffFormProps) => {
     const { initialValues, onCancel, onSubmit } = props;
     const [name, setName] = useState(initialValues.name);
     const [hotkey, setHotkey] = useState(initialValues.hotkey);
@@ -53,15 +53,15 @@ export const AddMarkForm = (props: AddMarkFormProps) => {
     };
 
     return (
-        <div className="bookmark-dialog">
-            <div className="bookmark-dialog-content">
-                <h3>Add New Bookmark</h3>
-                <form id="bookmark-form" onSubmit={handleSubmit}>
+        <div className="riff-dialog">
+            <div className="riff-dialog-content">
+                <h3>Add New Bookriff</h3>
+                <form id="riff-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="bookmark-name">Name:</label>
+                        <label htmlFor="riff-name">Name:</label>
                         <input
                             type="text"
-                            id="bookmark-name"
+                            id="riff-name"
                             ref={nameInputRef}
                             value={name}
                             onInput={(e) =>
@@ -71,12 +71,12 @@ export const AddMarkForm = (props: AddMarkFormProps) => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="bookmark-hotkey">
+                        <label htmlFor="riff-hotkey">
                             Hotkey (single character):
                         </label>
                         <input
                             type="text"
-                            id="bookmark-hotkey"
+                            id="riff-hotkey"
                             maxLength={1}
                             value={hotkey}
                             onInput={(e) =>
@@ -86,9 +86,9 @@ export const AddMarkForm = (props: AddMarkFormProps) => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="bookmark-time">Time (seconds):</label>
+                        <label htmlFor="riff-time">Time (seconds):</label>
                         <DurationInput
-                            id="bookmark-time"
+                            id="riff-time"
                             value={time}
                             required
                         />
@@ -97,7 +97,7 @@ export const AddMarkForm = (props: AddMarkFormProps) => {
                         <button type="submit">Save</button>
                         <button
                             type="button"
-                            id="cancel-bookmark"
+                            id="cancel-riff"
                             onClick={onCancel}
                         >
                             Cancel
