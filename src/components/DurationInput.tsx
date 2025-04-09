@@ -2,13 +2,14 @@ import { h } from "preact";
 import { useState } from "preact/hooks";
 
 export interface DurationInputProps {
+    className?: string;
     id: string;
     required: boolean;
     value?: number;
 }
 
 export const DurationInput = (props: DurationInputProps) => {
-    const { id, required, value } = props;
+    const { className, id, required, value } = props;
 
     const [inputValue, setInputValue] = useState("01:35");
 
@@ -47,6 +48,7 @@ export const DurationInput = (props: DurationInputProps) => {
 
     return (
         <input
+            className={className}
             id={id}
             onInput={handleInput}
             required={required}

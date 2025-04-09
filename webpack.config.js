@@ -51,7 +51,6 @@ export default {
             patterns: [
                 { from: "src/manifest.json", to: "." },
                 { from: "src/popup/popup.html", to: "." },
-                { from: "src/styles.css", to: "." },
             ],
         }),
     ],

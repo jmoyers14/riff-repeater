@@ -1,11 +1,14 @@
 import { groupRiffsByHotkey } from "./utils/groupRiffsByHotkey";
 import { h, render } from "preact";
 import { jumpToTime } from "./utils/videoPlayer";
+import { setup } from "goober";
 import { waitForElement } from "./utils/waitForElement";
 import { ChromeStorageRiffsRepository } from "./riffsRepository/chromeStorageRiffsRepository";
 import { ControlPanel } from "./components/ControlPanel";
 import { Riff } from "./types";
 import { RiffsRepositroy } from "./riffsRepository/riffsRepository";
+
+setup(h);
 
 const ROOT_ID = "yt-practice-root";
 const ABOVE_THE_FOLD_SELECTOR = "#above-the-fold";
