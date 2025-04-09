@@ -1,6 +1,6 @@
+import { css } from "goober";
 import { h } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
-import "../styles.css";
 import { DurationInput } from "./DurationInput";
 
 import { Riff } from "../types";
@@ -12,6 +12,69 @@ interface AddRiffFormProps {
     onSubmit: (riff: Riff) => void;
     onCancel: () => void;
 }
+
+const $riffDialog = css({
+    position: "fixed",
+    top: "0",
+    left: "0",
+    right: "0",
+    bottom: "0",
+    background: "rgba(0, 0, 0, 0.7)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 9999,
+});
+
+const $dialogContent = css({
+    background: "#2f2f2f",
+    padding: "20px",
+    borderRadius: "8px",
+    minWidth: "300px",
+});
+
+const $formGroup = css({
+    marginBottom: "15px",
+});
+
+const $formLabel = css({
+    display: "block",
+    marginBottom: "5px",
+    color: "white",
+});
+
+const $formInput = css({
+    width: "100%",
+    padding: "8px",
+    border: "1px solid #444",
+    borderRadius: "4px",
+    background: "#1f1f1f",
+    color: "white",
+});
+
+const $dialogButtons = css({
+    display: "flex",
+    gap: "10px",
+    justifyContent: "flex-end",
+});
+
+const $submitButton = css({
+    padding: "8px 16px",
+    borderRadius: "4px",
+    border: "none",
+    cursor: "pointer",
+    background: "#065fd4",
+    color: "white",
+});
+
+const $cancelButton = css({
+    padding: "8px 16px",
+    borderRadius: "4px",
+    border: "none",
+    cursor: "pointer",
+    background: "#444",
+    color: "white",
+});
 
 export const AddRiffForm = (props: AddRiffFormProps) => {
     const { initialValues, onCancel, onSubmit } = props;
@@ -53,13 +116,16 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
     };
 
     return (
-        <div className="riff-dialog">
-            <div className="riff-dialog-content">
+        <div className={$riffDialog}>
+            <div className={$dialogContent}>
                 <h3>Add New Bookriff</h3>
                 <form id="riff-form" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="riff-name">Name:</label>
+                    <div className={$formGroup}>
+                        <label className={$formLabel} htmlFor="riff-name">
+                            Name:
+                        </label>
                         <input
+                            className={$formInput}
                             type="text"
                             id="riff-name"
                             ref={nameInputRef}
@@ -70,11 +136,12 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
                             required
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="riff-hotkey">
+                    <div className={$formGroup}>
+                        <label className={$formLabel} htmlFor="riff-hotkey">
                             Hotkey (single character):
                         </label>
                         <input
+                            className={$formInput}
                             type="text"
                             id="riff-hotkey"
                             maxLength={1}
@@ -85,17 +152,23 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
                             required
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="riff-time">Time (seconds):</label>
+                    <div className={$formGroup}>
+                        <label className={$formLabel} htmlFor="riff-time">
+                            Time (seconds):
+                        </label>
                         <DurationInput
+                            className={$formInput}
                             id="riff-time"
                             value={time}
                             required
                         />
                     </div>
-                    <div className="dialog-buttons">
-                        <button type="submit">Save</button>
+                    <div className={$dialogButtons}>
+                        <button className={$submitButton} type="submit">
+                            Save
+                        </button>
                         <button
+                            className={$cancelButton}
                             type="button"
                             id="cancel-riff"
                             onClick={onCancel}

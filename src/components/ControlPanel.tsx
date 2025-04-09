@@ -1,13 +1,60 @@
+import { colors, fontFamilies } from "../theme";
+import { css } from "goober";
 import { getCurrentTime } from "../utils/videoPlayer";
 import { h } from "preact";
 import { useState } from "preact/hooks";
 import { AddRiffForm, AddRiffFormValues } from "./AddRiffForm";
 import { Riff } from "../types";
 import { RiffItem } from "./RiffItem";
-import "../styles.css";
 import "../assets/plus-circle.svg";
 
 const addSvg = chrome.runtime.getURL("assets/plus-circle.svg");
+
+const $panel = css({
+    border: `2px solid ${colors.sapphire}`,
+    borderRadius: "10px",
+    padding: "16px",
+    backgroundColor: colors.base,
+    margin: "16px 0px",
+});
+
+const $panelHeader = css({
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "12px",
+});
+
+const $title = css({
+    color: colors.text,
+    margin: "0px",
+    fontSize: "1.8em",
+    fontWeight: "bold",
+    fontFamily: fontFamilies.sans,
+});
+
+const $addButton = css({
+    backgroundColor: "transparent",
+    border: "none",
+    margin: "0",
+    cursor: "pointer",
+    padding: "0",
+    display: "flex",
+    alignItems: "center",
+});
+
+const $addButtonImg = css({
+    width: "24px",
+    height: "24px",
+    filter: "invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg) brightness(96%) contrast(89%)",
+    ":hover": {
+        filter: "invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(95%)",
+    },
+});
+
+const $riffsContainer = css({
+    marginTop: "24px",
+});
 
 interface ControlPanelProps {
     videoId?: string;
@@ -44,14 +91,14 @@ export const ControlPanel = (props: ControlPanelProps) => {
     };
 
     return (
-        <div className="yt-control-panel">
-            <div className="panel-header">
-                <h1 className="title">Riff Reapeter</h1>
-                <button className="add-button" onClick={handleAddRiff}>
-                    <img src={addSvg} alt="Add" />
+        <div className={$panel}>
+            <div className={$panelHeader}>
+                <h1 className={$title}>Riff Reapeter</h1>
+                <button className={$addButton} onClick={handleAddRiff}>
+                    <img className={$addButtonImg} src={addSvg} alt="Add" />
                 </button>
             </div>
-            <div className="riffs-container">
+            <div className={$riffsContainer}>
                 {Object.values(riffs).map((riff) => (
                     <RiffItem
                         key={riff.hotkey}
@@ -70,62 +117,6 @@ export const ControlPanel = (props: ControlPanelProps) => {
                     onCancel={() => setSelectedRiff(undefined)}
                 />
             )}
-
-            <style>{`
-                .riff-dialog {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0, 0, 0, 0.7);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 9999;
-                }
-                .bookriff-dialog-content {
-                    background: #2f2f2f;
-                    padding: 20px;
-                    border-radius: 8px;
-                    min-width: 300px;
-                }
-                .form-group {
-                    margin-bottom: 15px;
-                }
-                .form-group label {
-                    display: block;
-                    margin-bottom: 5px;
-                    color: white;
-                }
-                .form-group input {
-                    width: 100%;
-                    padding: 8px;
-                    border: 1px solid #444;
-                    border-radius: 4px;
-                    background: #1f1f1f;
-                    color: white;
-                }
-                .dialog-buttons {
-                    display: flex;
-                    gap: 10px;
-                    justify-content: flex-end;
-                }
-                .dialog-buttons button {
-                    padding: 8px 16px;
-                    border-radius: 4px;
-                    border: none;
-                    cursor: pointer;
-                }
-                .dialog-buttons button[type="submit"] {
-                    background: #065fd4;
-                    color: white;
-                }
-                .dialog-buttons button[type="button"] {
-                    background: #444;
-                    color: white;
-                }
-            `}</style>
         </div>
     );
 };

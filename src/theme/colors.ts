@@ -118,3 +118,8 @@ const mocha = {
     mantle: "#181825",
     crust: "#11111b",
 };
+
+export const colors = {
+    ...latte,
+    border: latte.surface1,
+};
