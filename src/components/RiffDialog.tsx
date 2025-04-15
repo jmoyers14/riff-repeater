@@ -1,3 +1,4 @@
+import { colors, fontFamilies } from "../theme";
 import { css } from "goober";
 import { h } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
@@ -5,9 +6,9 @@ import { DurationInput } from "./DurationInput";
 
 import { Riff } from "../types";
 
-export type AddRiffFormValues = Partial<Riff>;
+export type RiffDialogValues = Partial<Riff>;
 
-interface AddRiffFormProps {
+interface RiffDialogProps {
     initialValues: Partial<Riff>;
     onSubmit: (riff: Riff) => void;
     onCancel: () => void;
@@ -27,7 +28,7 @@ const $riffDialog = css({
 });
 
 const $dialogContent = css({
-    background: "#2f2f2f",
+    background: colors.base,
     padding: "20px",
     borderRadius: "8px",
     minWidth: "300px",
@@ -39,17 +40,27 @@ const $formGroup = css({
 
 const $formLabel = css({
     display: "block",
-    marginBottom: "5px",
-    color: "white",
+    marginBottom: "8px",
+    color: colors.text,
+    fontSize: "14px",
+    fontFamily: fontFamilies.sans,
 });
 
 const $formInput = css({
     width: "100%",
-    padding: "8px",
-    border: "1px solid #444",
+    padding: "8px 12px",
+    border: "1px solid",
+    borderColor: colors.overlay0,
     borderRadius: "4px",
-    background: "#1f1f1f",
-    color: "white",
+    background: colors.crust,
+    color: colors.text,
+    boxSizing: "border-box",
+    transition: "border-color 0.2s ease",
+    "&:focus": {
+        outline: "none",
+        borderColor: colors.lavender,
+        boxShadow: `0 0 0 1px ${colors.lavender}`,
+    },
 });
 
 const $dialogButtons = css({
@@ -63,7 +74,7 @@ const $submitButton = css({
     borderRadius: "4px",
     border: "none",
     cursor: "pointer",
-    background: "#065fd4",
+    background: colors.lavender,
     color: "white",
 });
 
@@ -72,11 +83,11 @@ const $cancelButton = css({
     borderRadius: "4px",
     border: "none",
     cursor: "pointer",
-    background: "#444",
+    background: colors.overlay0,
     color: "white",
 });
 
-export const AddRiffForm = (props: AddRiffFormProps) => {
+export const RiffDialog = (props: RiffDialogProps) => {
     const { initialValues, onCancel, onSubmit } = props;
     const [name, setName] = useState(initialValues.name);
     const [hotkey, setHotkey] = useState(initialValues.hotkey);
@@ -118,7 +129,6 @@ export const AddRiffForm = (props: AddRiffFormProps) => {
     return (
         <div className={$riffDialog}>
             <div className={$dialogContent}>
-                <h3>Add New Bookriff</h3>
                 <form id="riff-form" onSubmit={handleSubmit}>
                     <div className={$formGroup}>
                         <label className={$formLabel} htmlFor="riff-name">
