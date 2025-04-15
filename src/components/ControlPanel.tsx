@@ -3,7 +3,7 @@ import { css } from "goober";
 import { getCurrentTime } from "../utils/videoPlayer";
 import { h } from "preact";
 import { useState } from "preact/hooks";
-import { AddRiffForm, AddRiffFormValues } from "./AddRiffForm";
+import { RiffDialog, RiffDialogValues } from "./RiffDialog";
 import { Riff } from "../types";
 import { RiffItem } from "./RiffItem";
 import "../assets/plus-circle.svg";
@@ -65,13 +65,13 @@ interface ControlPanelProps {
 
 export const ControlPanel = (props: ControlPanelProps) => {
     const [selectedRiff, setSelectedRiff] = useState<
-        AddRiffFormValues | undefined
+        RiffDialogValues | undefined
     >(undefined);
 
     const { onAddRiff, onDeleteRiff, riffs, videoId } = props;
 
     const handleAddRiff = () => {
-        const newRiff: AddRiffFormValues = {
+        const newRiff: RiffDialogValues = {
             time: getCurrentTime() ?? 0,
         };
         setSelectedRiff(newRiff);
@@ -111,7 +111,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
             </div>
 
             {selectedRiff && (
-                <AddRiffForm
+                <RiffDialog
                     initialValues={selectedRiff}
                     onSubmit={handleSubmitRiff}
                     onCancel={() => setSelectedRiff(undefined)}
