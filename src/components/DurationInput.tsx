@@ -1,4 +1,5 @@
 import { h } from "preact";
+import { formatTime } from "../utils/formatTime";
 import { useState } from "preact/hooks";
 
 export interface DurationInputProps {
@@ -9,9 +10,8 @@ export interface DurationInputProps {
 }
 
 export const DurationInput = (props: DurationInputProps) => {
-    const { className, id, required, value } = props;
-
-    const [inputValue, setInputValue] = useState("01:35");
+    const { className, id, required, value = 0 } = props;
+    const [inputValue, setInputValue] = useState(formatTime(value));
 
     const formatDuration = (value: string): string => {
         const digits = value.replace(/\D/g, "");

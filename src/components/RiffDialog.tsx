@@ -164,7 +164,7 @@ export const RiffDialog = (props: RiffDialogProps) => {
                     </div>
                     <div className={$formGroup}>
                         <label className={$formLabel} htmlFor="riff-time">
-                            Time (seconds):
+                            Time:
                         </label>
                         <DurationInput
                             className={$formInput}
