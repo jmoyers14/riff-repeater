@@ -28,10 +28,10 @@ const loadRiffs = async (videoId: string) => {
     }
 };
 
-const handleAddRiff = async (riff: Riff, videoId?: string) => {
+const handleSubmitRiff = async (riff: Riff, videoId?: string) => {
     riffs[riff.hotkey] = riff;
     if (videoId) {
-        await riffsRepository.addRiff(videoId, riff);
+        await riffsRepository.upsertRiff(videoId, riff);
     }
     renderControlPanel(videoId);
 };
@@ -59,7 +59,7 @@ const renderControlPanel = (videoId: string | undefined) => {
         <ControlPanel
             videoId={videoId}
             riffs={riffs}
-            onAddRiff={handleAddRiff}
+            onSubmitRiff={handleSubmitRiff}
             onDeleteRiff={handleDeleteRiff}
         />,
         rootContainer
