@@ -25,4 +25,16 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         const result = await chrome.storage.local.get(key);
         return result[key] ?? [];
     }
+
+    async upsertRiff(videoId: string, riff: Riff): Promise<void> {
+        const key = this.storageKey(videoId);
+        const riffs = await this.getRiffs(videoId);
+        const index = riffs.findIndex((r) => r.hotkey === riff.hotkey);
+        if (index >= 0) {
+            riffs[index] = riff;
+        } else {
+            riffs.push(riff);
+        }
+        await chrome.storage.local.set({ [key]: riffs });
+    }
 }

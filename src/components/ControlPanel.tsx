@@ -59,7 +59,7 @@ const $riffsContainer = css({
 interface ControlPanelProps {
     videoId?: string;
     riffs: Record<string, Riff>;
-    onAddRiff: (riff: Riff, videoId?: string) => Promise<void>;
+    onSubmitRiff: (riff: Riff, videoId?: string) => Promise<void>;
     onDeleteRiff: (riff: Riff, videoId?: string) => Promise<void>;
 }
 
@@ -68,7 +68,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
         RiffDialogValues | undefined
     >(undefined);
 
-    const { onAddRiff, onDeleteRiff, riffs, videoId } = props;
+    const { onSubmitRiff, onDeleteRiff, riffs, videoId } = props;
 
     const handleAddRiff = () => {
         const newRiff: RiffDialogValues = {
@@ -86,7 +86,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
     };
 
     const handleSubmitRiff = async (riff: Riff) => {
-        await onAddRiff(riff, videoId);
+        await onSubmitRiff(riff, videoId);
         setSelectedRiff(undefined);
     };
 

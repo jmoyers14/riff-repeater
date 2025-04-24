@@ -1,7 +1,8 @@
 import { Riff } from "../types";
 
 export interface RiffsRepositroy {
-    addRiff(song: string, riff: Riff): Promise<void>;
-    deleteRiff(song: string, riff: Riff): Promise<void>;
-    getRiffs(song: string): Promise<Riff[]>;
+    addRiff(videoId: string, riff: Riff): Promise<void>;
+    deleteRiff(videoId: string, riff: Riff): Promise<void>;
+    getRiffs(videoId: string): Promise<Riff[]>;
+    upsertRiff(videoId: string, riff: Riff): Promise<void>;
 }
