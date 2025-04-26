@@ -1,26 +1,25 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} **/
+import { TS_EXT_TO_TREAT_AS_ESM, ESM_TS_TRANSFORM_PATTERN } from "ts-jest";
+
 export default {
-    preset: "ts-jest",
-    testEnvironment: "jsdom",
+    extensionsToTreatAsEsm: [...TS_EXT_TO_TREAT_AS_ESM],
     testMatch: [
-        "<rootDir>/__tests__/**/*.ts?(x)",
         "<rootDir>/__tests__/**/*.spec.ts?(x)",
         "<rootDir>/__tests__/**/*.test.ts?(x)",
     ],
-    moduleNameMapper: {
-        // Your module mappings
-        "^@/(.*)$": "<rootDir>/src/$1",
-        "\\.css$": "identity-obj-proxy",
-        "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
-    },
     transform: {
-        "^.+\\.tsx?$": [
+        [ESM_TS_TRANSFORM_PATTERN]: [
             "ts-jest",
             {
                 useESM: true,
             },
         ],
     },
-    extensionsToTreatAsEsm: [".ts", ".tsx"],
-    moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
     setupFilesAfterEnv: ["./jest.setup.js"],
+    injectGlobals: true,
+    globals: {
+        "ts-jest": {
+            useESM: true,
+        },
+    },
 };

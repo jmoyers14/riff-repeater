@@ -3,3 +3,5 @@ export type Riff = {
     name: string;
     time: number;
 };
+
+export type SavedRiff = { id: string } & Riff;
