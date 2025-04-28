@@ -1,7 +1,7 @@
 import { colors, fontFamilies } from "../theme";
 import { css } from "goober";
 import { h } from "preact";
-import { Riff } from "../types";
+import { SavedRiff } from "../types";
 import { formatTime } from "../utils/formatTime";
 import "../assets/edit.svg";
 
@@ -67,9 +67,9 @@ const $editButtonImg = css({
 });
 
 interface RiffItemProps {
-    riff: Riff;
-    onDelete: (riff: Riff) => void;
-    onEdit: (riff: Riff) => void;
+    riff: SavedRiff;
+    onDelete: (riff: SavedRiff) => void;
+    onEdit: (riff: SavedRiff) => void;
     onJump: (time: number) => void;
 }
 

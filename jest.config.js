@@ -15,7 +15,7 @@ export default {
             },
         ],
     },
-    setupFilesAfterEnv: ["./jest.setup.js"],
+    setupFiles: ["<rootDir>/__tests__/jest.setup.js"],
     injectGlobals: true,
     globals: {
         "ts-jest": {
