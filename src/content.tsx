@@ -34,11 +34,12 @@ const handleSubmitRiff = async (riff: Riff | SavedRiff, videoId: string) => {
     renderControlPanel(videoId);
 };
 
-const handleDeleteRiff = async (riff: Riff, videoId: string) => {
-    delete riffs[riff.hotkey];
-    if (videoId) {
-        await riffsRepository.deleteRiff(videoId, riff);
-    }
+const handleDeleteRiff = async (riff: SavedRiff, videoId: string) => {
+    console.log("handleDeleteRiff", riff);
+    const updatedRiffs = await riffsRepository.deleteRiff(videoId, riff);
+    riffs = groupRiffsByHotkey(updatedRiffs);
+    console.log("riffs post delete", riffs);
+    renderControlPanel(videoId);
 };
 
 const initializeRootContainer = () => {
@@ -57,8 +58,8 @@ const renderControlPanel = (videoId: string | undefined) => {
         <ControlPanel
             videoId={videoId}
             riffs={riffs}
-            onSubmitRiff={handleSubmitRiff}
             onDeleteRiff={handleDeleteRiff}
+            onSubmitRiff={handleSubmitRiff}
         />,
         rootContainer
     );

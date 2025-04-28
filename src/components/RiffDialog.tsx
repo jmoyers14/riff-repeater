@@ -1,6 +1,7 @@
 import { colors, fontFamilies } from "../theme";
 import { css } from "goober";
 import { h } from "preact";
+import { isSavedRiff } from "../utils/isSavedRiff";
 import { useState, useEffect, useRef } from "preact/hooks";
 import { DurationInput } from "./DurationInput";
 
@@ -8,8 +9,9 @@ import { Riff, SavedRiff } from "../types";
 
 interface RiffDialogProps {
     initialValues: Partial<SavedRiff>;
-    onSubmit: (riff: Riff | SavedRiff) => void;
     onCancel: () => void;
+    onDelete: (riff: SavedRiff) => void;
+    onSubmit: (riff: Riff | SavedRiff) => void;
 }
 
 const $riffDialog = css({
@@ -85,8 +87,17 @@ const $cancelButton = css({
     color: "white",
 });
 
+const $deleteButton = css({
+    padding: "8px 16px",
+    borderRadius: "4px",
+    border: "none",
+    cursor: "pointer",
+    background: colors.red,
+    color: "white",
+});
+
 export const RiffDialog = (props: RiffDialogProps) => {
-    const { initialValues, onCancel, onSubmit } = props;
+    const { initialValues, onCancel, onDelete, onSubmit } = props;
     const [name, setName] = useState(initialValues.name);
     const [hotkey, setHotkey] = useState(initialValues.hotkey);
     const [time, setTime] = useState(initialValues.time);
@@ -98,6 +109,14 @@ export const RiffDialog = (props: RiffDialogProps) => {
             nameInputRef.current.focus();
         }
     }, []);
+
+    const handleDelete = (e: Event) => {
+        e.preventDefault();
+        if (!isSavedRiff(initialValues)) {
+            return;
+        }
+        onDelete(initialValues);
+    };
 
     const handleSubmit = (e: Event) => {
         e.preventDefault();
@@ -179,6 +198,14 @@ export const RiffDialog = (props: RiffDialogProps) => {
                         <button className={$submitButton} type="submit">
                             Save
                         </button>
+                        {initialValues.id ? (
+                            <button
+                                className={$deleteButton}
+                                onClick={handleDelete}
+                            >
+                                Delete
+                            </button>
+                        ) : null}
                         <button
                             className={$cancelButton}
                             type="button"

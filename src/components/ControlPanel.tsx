@@ -70,6 +70,8 @@ export const ControlPanel = (props: ControlPanelProps) => {
 
     const { onSubmitRiff, onDeleteRiff, riffs, videoId } = props;
 
+    console.log("riffs", riffs);
+
     const handleAddRiff = () => {
         const newRiff: Partial<SavedRiff> = {
             time: getCurrentTime() ?? 0,
@@ -81,7 +83,8 @@ export const ControlPanel = (props: ControlPanelProps) => {
         if (!videoId) {
             return;
         }
-        return onDeleteRiff(riff, videoId);
+        onDeleteRiff(riff, videoId);
+        setSelectedRiff(undefined);
     };
 
     const handleEditRiff = async (riff: SavedRiff) => {
@@ -119,8 +122,9 @@ export const ControlPanel = (props: ControlPanelProps) => {
             {selectedRiff && (
                 <RiffDialog
                     initialValues={selectedRiff}
-                    onSubmit={handleSubmitRiff}
                     onCancel={() => setSelectedRiff(undefined)}
+                    onDelete={handleDeleteRiff}
+                    onSubmit={handleSubmitRiff}
                 />
             )}
         </div>

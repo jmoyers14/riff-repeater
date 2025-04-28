@@ -47,9 +47,9 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         return savedRiffs;
     }
 
-    async deleteRiff(videoId: string, riff: Riff): Promise<SavedRiff[]> {
+    async deleteRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff[]> {
         const riffs = await this.getRiffs(videoId);
-        const filtered = riffs.filter((m) => m.hotkey !== riff.hotkey);
+        const filtered = riffs.filter((m) => m.id !== riff.id);
         await chrome.storage.local.set({
             [this.storageKey(videoId)]: filtered,
         });
