@@ -70,8 +70,6 @@ export const ControlPanel = (props: ControlPanelProps) => {
 
     const { onSubmitRiff, onDeleteRiff, riffs, videoId } = props;
 
-    console.log("riffs", riffs);
-
     const handleAddRiff = () => {
         const newRiff: Partial<SavedRiff> = {
             time: getCurrentTime() ?? 0,
@@ -99,6 +97,10 @@ export const ControlPanel = (props: ControlPanelProps) => {
         setSelectedRiff(undefined);
     };
 
+    const sortAsc = (riffA: SavedRiff, riffB: SavedRiff) => {
+        return riffA.time - riffB.time;
+    };
+
     return (
         <div className={$panel}>
             <div className={$panelHeader}>
@@ -108,15 +110,17 @@ export const ControlPanel = (props: ControlPanelProps) => {
                 </button>
             </div>
             <div className={$riffsContainer}>
-                {Object.values(riffs).map((riff) => (
-                    <RiffItem
-                        key={riff.hotkey}
-                        riff={riff}
-                        onDelete={handleDeleteRiff}
-                        onEdit={handleEditRiff}
-                        onJump={() => {}}
-                    />
-                ))}
+                {Object.values(riffs)
+                    .sort(sortAsc)
+                    .map((riff) => (
+                        <RiffItem
+                            key={riff.hotkey}
+                            riff={riff}
+                            onDelete={handleDeleteRiff}
+                            onEdit={handleEditRiff}
+                            onJump={() => {}}
+                        />
+                    ))}
             </div>
 
             {selectedRiff && (
