@@ -32,7 +32,7 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         };
     }
 
-    async addRiff(videoId: string, riff: Riff): Promise<SavedRiff> {
+    async addRiff(videoId: string, riff: Riff): Promise<SavedRiff[]> {
         const riffs = await this.getRiffs(videoId);
 
         const existingRiff = riffs.find((r) => r.hotkey === riff.hotkey);
@@ -40,19 +40,20 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
             throw new DuplicateHotkeyError(riff.hotkey);
         }
 
-        const savedRiff = this.createRiff(riff);
+        const savedRiffs = [...riffs, this.createRiff(riff)];
         await chrome.storage.local.set({
-            [this.storageKey(videoId)]: [...riffs, savedRiff],
+            [this.storageKey(videoId)]: savedRiffs,
         });
-        return savedRiff;
+        return savedRiffs;
     }
 
-    async deleteRiff(videoId: string, riff: Riff): Promise<void> {
+    async deleteRiff(videoId: string, riff: Riff): Promise<SavedRiff[]> {
         const riffs = await this.getRiffs(videoId);
         const filtered = riffs.filter((m) => m.hotkey !== riff.hotkey);
         await chrome.storage.local.set({
             [this.storageKey(videoId)]: filtered,
         });
+        return filtered;
     }
 
     async getRiffs(videoId: string): Promise<SavedRiff[]> {
@@ -61,7 +62,7 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         return result[key] ?? [];
     }
 
-    async updateRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff> {
+    async updateRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff[]> {
         const key = this.storageKey(videoId);
         const riffs = await this.getRiffs(videoId);
         const index = riffs.findIndex((r) => r.id === riff.id);
@@ -71,18 +72,16 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
             throw new RiffNotFoundError(videoId, riff.id);
         }
         await chrome.storage.local.set({ [key]: riffs });
-        return riff;
+        return riffs;
     }
 
     async upsertRiff(
         videoId: string,
         riff: SavedRiff | Riff
-    ): Promise<SavedRiff> {
+    ): Promise<SavedRiff[]> {
         if (isSavedRiff(riff)) {
-            console.log("IS SAVED", riff);
             return this.updateRiff(videoId, riff);
         } else {
-            console.log("IS ADD", riff);
             return this.addRiff(videoId, riff);
         }
     }

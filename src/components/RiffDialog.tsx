@@ -93,8 +93,6 @@ export const RiffDialog = (props: RiffDialogProps) => {
 
     const nameInputRef = useRef<HTMLInputElement>(null);
 
-    console.log("riff dialog", initialValues);
-
     useEffect(() => {
         if (nameInputRef.current) {
             nameInputRef.current.focus();

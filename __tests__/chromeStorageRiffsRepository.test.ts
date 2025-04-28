@@ -116,13 +116,16 @@ describe("ChromeStorageRiffsRepository", () => {
                 [`riffs_${videoId}`]: existingRiffs,
             });
 
-            await repository.deleteRiff(videoId, sampleRiff);
+            const result = await repository.deleteRiff(videoId, sampleRiff);
 
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
                 [`riffs_${videoId}`]: [
                     { hotkey: "b", text: "Another riff", timestamp: 20 },
                 ],
             });
+            expect(result).toEqual([
+                { hotkey: "b", text: "Another riff", timestamp: 20 },
+            ]);
         });
 
         it("should not change anything if riff doesn't exist", async () => {
@@ -133,11 +136,12 @@ describe("ChromeStorageRiffsRepository", () => {
                 [`riffs_${videoId}`]: existingRiffs,
             });
 
-            await repository.deleteRiff(videoId, sampleRiff);
+            const result = await repository.deleteRiff(videoId, sampleRiff);
 
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
                 [`riffs_${videoId}`]: existingRiffs,
             });
+            expect(result).toEqual(existingRiffs);
         });
     });
 
@@ -159,7 +163,7 @@ describe("ChromeStorageRiffsRepository", () => {
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
                 [`riffs_${videoId}`]: [updatedRiff],
             });
-            expect(result).toEqual(updatedRiff);
+            expect(result).toEqual([updatedRiff]);
         });
 
         it("should throw RiffNotFoundError when riff does not exist", async () => {
@@ -194,7 +198,7 @@ describe("ChromeStorageRiffsRepository", () => {
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
                 [`riffs_${videoId}`]: [savedSampleRiff],
             });
-            expect(result).toEqual(savedSampleRiff);
+            expect(result).toEqual([savedSampleRiff]);
         });
 
         it("should update an existing riff when given a saved riff", async () => {
@@ -215,7 +219,7 @@ describe("ChromeStorageRiffsRepository", () => {
                 [`riffs_${videoId}`]: [updatedRiff],
             });
 
-            expect(result).toEqual(updatedRiff);
+            expect(result).toEqual([updatedRiff]);
         });
 
         it("should throw RiffNotFoundError when updating non-existent saved riff", async () => {

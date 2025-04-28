@@ -29,8 +29,8 @@ const loadRiffs = async (videoId: string) => {
 };
 
 const handleSubmitRiff = async (riff: Riff | SavedRiff, videoId: string) => {
-    const savedRiff = await riffsRepository.upsertRiff(videoId, riff);
-    riffs[savedRiff.hotkey] = savedRiff;
+    const updatedRiffs = await riffsRepository.upsertRiff(videoId, riff);
+    riffs = groupRiffsByHotkey(updatedRiffs);
     renderControlPanel(videoId);
 };
 
