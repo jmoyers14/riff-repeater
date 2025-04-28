@@ -1,5 +1,6 @@
 import { h } from "preact";
 import { formatTime } from "../utils/formatTime";
+import { formattedDurationToSeconds } from "../utils/formattedDurationToSeconds";
 import { useState } from "preact/hooks";
 
 export interface DurationInputProps {
@@ -7,6 +8,7 @@ export interface DurationInputProps {
     id: string;
     required: boolean;
     value?: number;
+    onDurationChanged?: (duration: number) => void;
 }
 
 export const DurationInput = (props: DurationInputProps) => {
@@ -38,12 +40,17 @@ export const DurationInput = (props: DurationInputProps) => {
     };
 
     const handleInput = (e: h.JSX.TargetedEvent<HTMLInputElement, Event>) => {
+        const { onDurationChanged } = props;
         const target = e.currentTarget;
         const rawValue = target.value;
 
         const formattedValue = formatDuration(rawValue);
+        const duration = formattedDurationToSeconds(formattedValue);
 
         setInputValue(formattedValue);
+        if (onDurationChanged && duration) {
+            onDurationChanged(duration);
+        }
     };
 
     return (

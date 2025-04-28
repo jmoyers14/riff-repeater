@@ -1,15 +1,50 @@
-import { Riff } from "../types";
+import { Riff, SavedRiff } from "../types";
 import { RiffsRepositroy } from "./riffsRepository";
+import { generateId } from "../utils/generateId";
+import { isSavedRiff } from "../utils/isSavedRiff";
+
+export class DuplicateHotkeyError extends Error {
+    constructor(public hotkey: string) {
+        super(
+            `Hotkey "${hotkey}" is already in use. Please choose a different hotkey.`
+        );
+    }
+}
+
+export class RiffNotFoundError extends Error {
+    constructor(
+        public videoId: string,
+        public id: string
+    ) {
+        super(`Riff ${videoId} ${id} not found.`);
+    }
+}
 
 export class ChromeStorageRiffsRepository implements RiffsRepositroy {
     private storageKey(videoId: string): string {
         return `riffs_${videoId}`;
     }
 
-    async addRiff(videoId: string, riff: Riff): Promise<void> {
+    private createRiff(riff: Riff): SavedRiff {
+        return {
+            ...riff,
+            id: generateId(),
+        };
+    }
+
+    async addRiff(videoId: string, riff: Riff): Promise<SavedRiff> {
         const riffs = await this.getRiffs(videoId);
-        riffs.push(riff);
-        await chrome.storage.local.set({ [this.storageKey(videoId)]: riffs });
+
+        const existingRiff = riffs.find((r) => r.hotkey === riff.hotkey);
+        if (existingRiff) {
+            throw new DuplicateHotkeyError(riff.hotkey);
+        }
+
+        const savedRiff = this.createRiff(riff);
+        await chrome.storage.local.set({
+            [this.storageKey(videoId)]: [...riffs, savedRiff],
+        });
+        return savedRiff;
     }
 
     async deleteRiff(videoId: string, riff: Riff): Promise<void> {
@@ -20,21 +55,35 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         });
     }
 
-    async getRiffs(videoId: string): Promise<Riff[]> {
+    async getRiffs(videoId: string): Promise<SavedRiff[]> {
         const key = this.storageKey(videoId);
         const result = await chrome.storage.local.get(key);
         return result[key] ?? [];
     }
 
-    async upsertRiff(videoId: string, riff: Riff): Promise<void> {
+    async updateRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff> {
         const key = this.storageKey(videoId);
         const riffs = await this.getRiffs(videoId);
-        const index = riffs.findIndex((r) => r.hotkey === riff.hotkey);
+        const index = riffs.findIndex((r) => r.id === riff.id);
         if (index >= 0) {
             riffs[index] = riff;
         } else {
-            riffs.push(riff);
+            throw new RiffNotFoundError(videoId, riff.id);
         }
         await chrome.storage.local.set({ [key]: riffs });
+        return riff;
+    }
+
+    async upsertRiff(
+        videoId: string,
+        riff: SavedRiff | Riff
+    ): Promise<SavedRiff> {
+        if (isSavedRiff(riff)) {
+            console.log("IS SAVED", riff);
+            return this.updateRiff(videoId, riff);
+        } else {
+            console.log("IS ADD", riff);
+            return this.addRiff(videoId, riff);
+        }
     }
 }

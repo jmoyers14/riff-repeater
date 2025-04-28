@@ -5,7 +5,7 @@ import { setup } from "goober";
 import { waitForElement } from "./utils/waitForElement";
 import { ChromeStorageRiffsRepository } from "./riffsRepository/chromeStorageRiffsRepository";
 import { ControlPanel } from "./components/ControlPanel";
-import { Riff } from "./types";
+import { Riff, SavedRiff } from "./types";
 import { RiffsRepositroy } from "./riffsRepository/riffsRepository";
 
 setup(h);
@@ -15,7 +15,7 @@ const ABOVE_THE_FOLD_SELECTOR = "#above-the-fold";
 
 const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
 
-let riffs: Record<string, Riff> = {};
+let riffs: Record<string, SavedRiff> = {};
 
 let rootContainer: HTMLDivElement | null = null;
 
@@ -28,15 +28,13 @@ const loadRiffs = async (videoId: string) => {
     }
 };
 
-const handleSubmitRiff = async (riff: Riff, videoId?: string) => {
-    riffs[riff.hotkey] = riff;
-    if (videoId) {
-        await riffsRepository.upsertRiff(videoId, riff);
-    }
+const handleSubmitRiff = async (riff: Riff | SavedRiff, videoId: string) => {
+    const savedRiff = await riffsRepository.upsertRiff(videoId, riff);
+    riffs[savedRiff.hotkey] = savedRiff;
     renderControlPanel(videoId);
 };
 
-const handleDeleteRiff = async (riff: Riff, videoId?: string) => {
+const handleDeleteRiff = async (riff: Riff, videoId: string) => {
     delete riffs[riff.hotkey];
     if (videoId) {
         await riffsRepository.deleteRiff(videoId, riff);

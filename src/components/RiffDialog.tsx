@@ -4,13 +4,11 @@ import { h } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
 import { DurationInput } from "./DurationInput";
 
-import { Riff } from "../types";
-
-export type RiffDialogValues = Partial<Riff>;
+import { Riff, SavedRiff } from "../types";
 
 interface RiffDialogProps {
-    initialValues: Partial<Riff>;
-    onSubmit: (riff: Riff) => void;
+    initialValues: Partial<SavedRiff>;
+    onSubmit: (riff: Riff | SavedRiff) => void;
     onCancel: () => void;
 }
 
@@ -95,6 +93,8 @@ export const RiffDialog = (props: RiffDialogProps) => {
 
     const nameInputRef = useRef<HTMLInputElement>(null);
 
+    console.log("riff dialog", initialValues);
+
     useEffect(() => {
         if (nameInputRef.current) {
             nameInputRef.current.focus();
@@ -120,6 +120,7 @@ export const RiffDialog = (props: RiffDialogProps) => {
         }
 
         onSubmit({
+            id: initialValues.id,
             name,
             hotkey,
             time,
@@ -171,6 +172,9 @@ export const RiffDialog = (props: RiffDialogProps) => {
                             id="riff-time"
                             value={time}
                             required
+                            onDurationChanged={(duration: number) => {
+                                setTime(duration);
+                            }}
                         />
                     </div>
                     <div className={$dialogButtons}>

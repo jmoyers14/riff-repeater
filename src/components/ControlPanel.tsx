@@ -3,8 +3,8 @@ import { css } from "goober";
 import { getCurrentTime } from "../utils/videoPlayer";
 import { h } from "preact";
 import { useState } from "preact/hooks";
-import { RiffDialog, RiffDialogValues } from "./RiffDialog";
-import { Riff } from "../types";
+import { RiffDialog } from "./RiffDialog";
+import { Riff, SavedRiff } from "../types";
 import { RiffItem } from "./RiffItem";
 import "../assets/plus-circle.svg";
 
@@ -58,34 +58,40 @@ const $riffsContainer = css({
 
 interface ControlPanelProps {
     videoId?: string;
-    riffs: Record<string, Riff>;
-    onSubmitRiff: (riff: Riff, videoId?: string) => Promise<void>;
-    onDeleteRiff: (riff: Riff, videoId?: string) => Promise<void>;
+    riffs: Record<string, SavedRiff>;
+    onSubmitRiff: (riff: Riff | SavedRiff, videoId: string) => Promise<void>;
+    onDeleteRiff: (riff: SavedRiff, videoId: string) => Promise<void>;
 }
 
 export const ControlPanel = (props: ControlPanelProps) => {
     const [selectedRiff, setSelectedRiff] = useState<
-        RiffDialogValues | undefined
+        Partial<SavedRiff> | undefined
     >(undefined);
 
     const { onSubmitRiff, onDeleteRiff, riffs, videoId } = props;
 
     const handleAddRiff = () => {
-        const newRiff: RiffDialogValues = {
+        const newRiff: Partial<SavedRiff> = {
             time: getCurrentTime() ?? 0,
         };
         setSelectedRiff(newRiff);
     };
 
-    const handleDeleteRiff = async (riff: Riff) => {
+    const handleDeleteRiff = async (riff: SavedRiff) => {
+        if (!videoId) {
+            return;
+        }
         return onDeleteRiff(riff, videoId);
     };
 
-    const handleEditRiff = async (riff: Riff) => {
+    const handleEditRiff = async (riff: SavedRiff) => {
         setSelectedRiff(riff);
     };
 
-    const handleSubmitRiff = async (riff: Riff) => {
+    const handleSubmitRiff = async (riff: Riff | SavedRiff) => {
+        if (!videoId) {
+            return;
+        }
         await onSubmitRiff(riff, videoId);
         setSelectedRiff(undefined);
     };
