@@ -12,7 +12,7 @@ export default {
     entry: {
         background: "./src/background.ts",
         content: "./src/content.tsx",
-        popup: "./src/popup/popup.ts",
+        popup: "./src/popup/popup.tsx",
     },
     output: {
         path: path.resolve(__dirname, "dist"),
