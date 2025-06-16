@@ -1,3 +1,4 @@
+import { extractVideoInfo } from "./utils/extractVideoInfo";
 import { groupRiffsByHotkey } from "./utils/groupRiffsByHotkey";
 import { h, render } from "preact";
 import { jumpToTime } from "./utils/videoPlayer";
@@ -5,7 +6,7 @@ import { setup } from "goober";
 import { waitForElement } from "./utils/waitForElement";
 import { ChromeStorageRiffsRepository } from "./riffsRepository/chromeStorageRiffsRepository";
 import { ControlPanel } from "./components/ControlPanel";
-import { Riff, SavedRiff } from "./types";
+import { Riff, SavedRiff, Video } from "./types";
 import { RiffsRepositroy } from "./riffsRepository/riffsRepository";
 
 setup(h);
@@ -29,16 +30,19 @@ const loadRiffs = async (videoId: string) => {
 };
 
 const handleSubmitRiff = async (riff: Riff | SavedRiff, videoId: string) => {
+    const video = await riffsRepository.getVideo(videoId);
+    if (!video) {
+        const videoInfo = extractVideoInfo(videoId);
+        await riffsRepository.addVideo({ ...videoInfo, riffs: [] });
+    }
     const updatedRiffs = await riffsRepository.upsertRiff(videoId, riff);
     riffs = groupRiffsByHotkey(updatedRiffs);
     renderControlPanel(videoId);
 };
 
 const handleDeleteRiff = async (riff: SavedRiff, videoId: string) => {
-    console.log("handleDeleteRiff", riff);
     const updatedRiffs = await riffsRepository.deleteRiff(videoId, riff);
     riffs = groupRiffsByHotkey(updatedRiffs);
-    console.log("riffs post delete", riffs);
     renderControlPanel(videoId);
 };
 

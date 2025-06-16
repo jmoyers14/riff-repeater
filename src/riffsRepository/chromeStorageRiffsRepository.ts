@@ -1,4 +1,4 @@
-import { Riff, SavedRiff } from "../types";
+import { Riff, SavedRiff, SavedVideo, Video } from "../types";
 import { RiffsRepositroy } from "./riffsRepository";
 import { generateId } from "../utils/generateId";
 import { isSavedRiff } from "../utils/isSavedRiff";
@@ -20,9 +20,24 @@ export class RiffNotFoundError extends Error {
     }
 }
 
+export class VideoNotFoundError extends Error {
+    constructor(public videoId: string) {
+        super(`Video ${videoId} not found.`);
+    }
+}
+
 export class ChromeStorageRiffsRepository implements RiffsRepositroy {
-    private storageKey(videoId: string): string {
-        return `riffs_${videoId}`;
+    private videoKeyPrefix = "video";
+    private videoKey(videoId: string): string {
+        return `${this.videoKeyPrefix}:${videoId}`;
+    }
+
+    private createSavedVideo(video: Video): SavedVideo {
+        return {
+            ...video,
+            createdDate: new Date(),
+            updatedAt: new Date(),
+        };
     }
 
     private createRiff(riff: Riff): SavedRiff {
@@ -33,46 +48,118 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
     }
 
     async addRiff(videoId: string, riff: Riff): Promise<SavedRiff[]> {
-        const riffs = await this.getRiffs(videoId);
+        const video = await this.getVideo(videoId);
+        if (!video) {
+            throw new VideoNotFoundError(videoId);
+        }
+
+        const { riffs } = video;
 
         const existingRiff = riffs.find((r) => r.hotkey === riff.hotkey);
         if (existingRiff) {
             throw new DuplicateHotkeyError(riff.hotkey);
         }
 
-        const savedRiffs = [...riffs, this.createRiff(riff)];
-        await chrome.storage.local.set({
-            [this.storageKey(videoId)]: savedRiffs,
+        const updatedVideo = await this.updateVideo({
+            ...video,
+            riffs: [...riffs, this.createRiff(riff)],
         });
-        return savedRiffs;
+
+        return updatedVideo.riffs;
+    }
+
+    async addVideo(video: Video): Promise<SavedVideo> {
+        const existingVideo = await this.getVideo(video.id);
+
+        if (existingVideo) {
+            const riffs = [...existingVideo.riffs, ...video.riffs];
+            const updatedVideo: SavedVideo = {
+                ...existingVideo,
+                ...video,
+                riffs,
+                createdDate: existingVideo.createdDate,
+                updatedAt: new Date(),
+            };
+
+            await chrome.storage.local.set({
+                [this.videoKey(video.id)]: updatedVideo,
+            });
+            return updatedVideo;
+        }
+
+        const savedVideo = this.createSavedVideo(video);
+        await chrome.storage.local.set({
+            [this.videoKey(video.id)]: savedVideo,
+        });
+        return savedVideo;
     }
 
     async deleteRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff[]> {
-        const riffs = await this.getRiffs(videoId);
-        const filtered = riffs.filter((m) => m.id !== riff.id);
-        await chrome.storage.local.set({
-            [this.storageKey(videoId)]: filtered,
+        const video = await this.getVideo(videoId);
+        if (!video) {
+            throw new VideoNotFoundError(videoId);
+        }
+
+        const updatedRiffs = video.riffs.filter((m) => m.id !== riff.id);
+
+        if (updatedRiffs.length === video.riffs.length) {
+            return video.riffs;
+        }
+
+        const updatedVideo = await this.updateVideo({
+            ...video,
+            riffs: updatedRiffs,
         });
-        return filtered;
+
+        return updatedVideo.riffs;
     }
 
     async getRiffs(videoId: string): Promise<SavedRiff[]> {
-        const key = this.storageKey(videoId);
-        const result = await chrome.storage.local.get(key);
-        return result[key] ?? [];
+        const result = await chrome.storage.local.get(this.videoKey(videoId));
+        return result[this.videoKey(videoId)]?.riffs ?? [];
+    }
+
+    async getVideo(videoId: string): Promise<SavedVideo | null> {
+        const videoKey = this.videoKey(videoId);
+        const result = await chrome.storage.local.get(videoKey);
+        return result[videoKey] || null;
+    }
+
+    async getVideos(): Promise<SavedVideo[]> {
+        const result = await chrome.storage.local.get();
+        return Object.values(result) as SavedVideo[];
     }
 
     async updateRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff[]> {
-        const key = this.storageKey(videoId);
-        const riffs = await this.getRiffs(videoId);
-        const index = riffs.findIndex((r) => r.id === riff.id);
+        const video = await this.getVideo(videoId);
+        if (!video) {
+            throw new VideoNotFoundError(videoId);
+        }
+        const index = video.riffs.findIndex((r) => r.id === riff.id);
         if (index >= 0) {
-            riffs[index] = riff;
+            video.riffs[index] = riff;
         } else {
             throw new RiffNotFoundError(videoId, riff.id);
         }
-        await chrome.storage.local.set({ [key]: riffs });
-        return riffs;
+        const updatedVideo = await this.updateVideo(video);
+        return updatedVideo.riffs;
+    }
+
+    async updateVideo(video: SavedVideo): Promise<SavedVideo> {
+        const existingVideo = await this.getVideo(video.id);
+        if (!existingVideo) {
+            throw new VideoNotFoundError(video.id);
+        }
+
+        const updatedVideo = {
+            ...video,
+            updatedAt: new Date(),
+        };
+
+        await chrome.storage.local.set({
+            [this.videoKey(video.id)]: updatedVideo,
+        });
+        return updatedVideo;
     }
 
     async upsertRiff(

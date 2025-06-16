@@ -1,5 +1,6 @@
-import { Riff, SavedRiff } from "../src/types";
+import { Riff, SavedRiff, SavedVideo, Video } from "../src/types";
 import { RiffsRepositroy } from "../src/riffsRepository/riffsRepository";
+import { mock } from "node:test";
 
 const mockGenerateId = jest.fn();
 // @ts-expect-error jest set globally in jest.setup.js
@@ -10,20 +11,32 @@ const { ChromeStorageRiffsRepository, DuplicateHotkeyError } = await import(
     "../src/riffsRepository/chromeStorageRiffsRepository"
 );
 
+const videoKey = (id: string): string => {
+    return `video:${id}`;
+};
+
 describe("ChromeStorageRiffsRepository", () => {
     const mockChromeGet = jest.fn();
     chrome.storage.local.get = mockChromeGet;
 
     let repository: RiffsRepositroy;
     const videoId = "test-video-id";
-    const sampleRiff: Riff = {
+    const mockRiff: Riff = {
         hotkey: "a",
         name: "Sample riff text",
         time: 15,
     };
-    const savedSampleRiff: SavedRiff = {
+    const savedMockRiff: SavedRiff = {
         id: "1234567890",
-        ...sampleRiff,
+        ...mockRiff,
+    };
+
+    const mockVideo: Video = {
+        id: videoId,
+        title: "Test Video",
+        thumbnail: "",
+        url: "https://youtube.com/watch?v=" + videoId,
+        riffs: [],
     };
 
     beforeEach(() => {
@@ -31,37 +44,155 @@ describe("ChromeStorageRiffsRepository", () => {
         jest.clearAllMocks();
     });
 
+    describe("addVideo", () => {
+        it("should create a new video when it doesn't exist", async () => {
+            mockChromeGet.mockResolvedValue({});
+
+            const result = await repository.addVideo(mockVideo);
+
+            expect(mockChromeGet).toHaveBeenCalledWith(videoKey(videoId));
+
+            expect(chrome.storage.local.set).toHaveBeenCalledWith({
+                [videoKey(videoId)]: {
+                    ...mockVideo,
+                    createdDate: expect.any(Date),
+                    updatedAt: expect.any(Date),
+                },
+            });
+
+            expect(result).toEqual(
+                expect.objectContaining({
+                    ...mockVideo,
+                    createdDate: expect.any(Date),
+                    updatedAt: expect.any(Date),
+                })
+            );
+        });
+
+        it("should update an existing video", async () => {
+            const existingVideo: SavedVideo = {
+                ...mockVideo,
+                title: "Old Title",
+                createdDate: new Date(2024, 0, 1),
+                updatedAt: new Date(2024, 0, 1),
+                riffs: [],
+            };
+
+            mockChromeGet.mockResolvedValue({
+                [videoKey(existingVideo.id)]: existingVideo,
+            });
+
+            const updatedVideo: Video = {
+                ...mockVideo,
+                title: "New Title",
+            };
+
+            const result = await repository.addVideo(updatedVideo);
+
+            expect(mockChromeGet).toHaveBeenCalledWith(videoKey(videoId));
+
+            expect(chrome.storage.local.set).toHaveBeenCalledWith({
+                [videoKey(videoId)]: expect.objectContaining({
+                    ...updatedVideo,
+                    createdDate: existingVideo.createdDate,
+                    updatedAt: expect.any(Date),
+                }),
+            });
+
+            expect(result).toEqual(
+                expect.objectContaining({
+                    ...updatedVideo,
+                    createdDate: existingVideo.createdDate,
+                    updatedAt: expect.any(Date),
+                })
+            );
+
+            expect(result.updatedAt.getTime()).toBeGreaterThan(
+                existingVideo.updatedAt.getTime()
+            );
+        });
+
+        it("should preserve existing riffs when updating a video", async () => {
+            const existingRiffs = [
+                { id: "riff1", hotkey: "a", name: "Riff 1", time: 10 },
+                { id: "riff2", hotkey: "b", name: "Riff 2", time: 20 },
+            ];
+
+            const existingVideo: SavedVideo = {
+                ...mockVideo,
+                riffs: existingRiffs,
+                createdDate: new Date(2024, 0, 1),
+                updatedAt: new Date(2024, 0, 1),
+            };
+
+            mockChromeGet.mockResolvedValue({
+                [videoKey(existingVideo.id)]: existingVideo,
+            });
+
+            const updatedVideo: Video = {
+                ...mockVideo,
+                title: "New Title",
+                riffs: [],
+            };
+
+            const result = await repository.addVideo(updatedVideo);
+
+            expect(result.riffs).toEqual(existingRiffs);
+            expect(chrome.storage.local.set).toHaveBeenCalledWith({
+                [videoKey(videoId)]: expect.objectContaining({
+                    ...updatedVideo,
+                    riffs: existingRiffs,
+                    createdDate: existingVideo.createdDate,
+                    updatedAt: expect.any(Date),
+                }),
+            });
+        });
+    });
+
     describe("getRiffs", () => {
         it("should return empty array when no riffs exist", async () => {
             mockChromeGet.mockResolvedValue({});
             const result = await repository.getRiffs(videoId);
-            expect(mockChromeGet).toHaveBeenCalledWith(`riffs_${videoId}`);
+            expect(mockChromeGet).toHaveBeenCalledWith(videoKey(videoId));
             expect(result).toEqual([]);
         });
 
         it("should return riffs when they exist", async () => {
-            const existingRiffs = [sampleRiff];
+            const existingRiffs = [mockRiff];
+            const existingVideo = {
+                ...mockVideo,
+                riffs: existingRiffs,
+            };
+
             mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: existingRiffs,
+                [videoKey(videoId)]: existingVideo,
             });
 
             const result = await repository.getRiffs(videoId);
 
-            expect(mockChromeGet).toHaveBeenCalledWith(`riffs_${videoId}`);
+            expect(mockChromeGet).toHaveBeenCalledWith(videoKey(videoId));
             expect(result).toEqual(existingRiffs);
         });
     });
 
     describe("addRiff", () => {
         it("should add a riff to an empty array", async () => {
-            mockChromeGet.mockResolvedValue({});
-            mockGenerateId.mockReturnValue(savedSampleRiff.id);
+            const video = {
+                ...mockVideo,
+                riffs: [],
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
+            mockGenerateId.mockReturnValue(savedMockRiff.id);
 
-            await repository.addRiff(videoId, sampleRiff);
+            await repository.addRiff(videoId, mockRiff);
 
-            expect(mockChromeGet).toHaveBeenCalledWith(`riffs_${videoId}`);
+            expect(mockChromeGet).toHaveBeenCalledWith(videoKey(videoId));
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
-                [`riffs_${videoId}`]: [savedSampleRiff],
+                [videoKey(videoId)]: {
+                    ...video,
+                    riffs: [savedMockRiff],
+                    updatedAt: expect.any(Date),
+                },
             });
         });
 
@@ -73,27 +204,36 @@ describe("ChromeStorageRiffsRepository", () => {
                 timestamp: 10,
             };
 
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: [existingRiff],
-            });
-            mockGenerateId.mockReturnValue(savedSampleRiff.id);
+            const video = {
+                ...mockVideo,
+                riffs: [existingRiff],
+            };
 
-            await repository.addRiff(videoId, sampleRiff);
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
+            mockGenerateId.mockReturnValue(savedMockRiff.id);
 
-            expect(mockChromeGet).toHaveBeenCalledWith(`riffs_${videoId}`);
+            await repository.addRiff(videoId, mockRiff);
+
+            expect(mockChromeGet).toHaveBeenCalledWith(videoKey(videoId));
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
-                [`riffs_${videoId}`]: [existingRiff, savedSampleRiff],
+                [videoKey(videoId)]: {
+                    ...video,
+                    riffs: [existingRiff, savedMockRiff],
+                    updatedAt: expect.any(Date),
+                },
             });
         });
 
         it("should throw duplicate error when a riff already exists for a hotkey", async () => {
-            const existingRiffs = [savedSampleRiff];
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: existingRiffs,
-            });
+            const existingRiffs = [savedMockRiff];
+            const video = {
+                ...mockVideo,
+                riffs: existingRiffs,
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
 
             const duplicateRiff: Riff = {
-                hotkey: savedSampleRiff.hotkey,
+                hotkey: savedMockRiff.hotkey,
                 name: "Another riff",
                 time: 30,
             };
@@ -109,19 +249,25 @@ describe("ChromeStorageRiffsRepository", () => {
     describe("deleteRiff", () => {
         it("should remove a riff based on hotkey", async () => {
             const existingRiffs = [
-                sampleRiff,
+                savedMockRiff,
                 { hotkey: "b", text: "Another riff", timestamp: 20 },
             ];
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: existingRiffs,
-            });
+            const video = {
+                ...mockVideo,
+                riffs: existingRiffs,
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
 
-            const result = await repository.deleteRiff(videoId, sampleRiff);
+            const result = await repository.deleteRiff(videoId, savedMockRiff);
 
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
-                [`riffs_${videoId}`]: [
-                    { hotkey: "b", text: "Another riff", timestamp: 20 },
-                ],
+                [videoKey(videoId)]: {
+                    ...video,
+                    riffs: [
+                        { hotkey: "b", text: "Another riff", timestamp: 20 },
+                    ],
+                    updatedAt: expect.any(Date),
+                },
             });
             expect(result).toEqual([
                 { hotkey: "b", text: "Another riff", timestamp: 20 },
@@ -132,28 +278,30 @@ describe("ChromeStorageRiffsRepository", () => {
             const existingRiffs = [
                 { hotkey: "b", text: "Another riff", timestamp: 20 },
             ];
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: existingRiffs,
-            });
+            const video = {
+                ...mockVideo,
+                riffs: existingRiffs,
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(videoId)]: video });
 
-            const result = await repository.deleteRiff(videoId, sampleRiff);
+            const result = await repository.deleteRiff(videoId, savedMockRiff);
 
-            expect(chrome.storage.local.set).toHaveBeenCalledWith({
-                [`riffs_${videoId}`]: existingRiffs,
-            });
+            expect(chrome.storage.local.set).not.toHaveBeenCalled();
             expect(result).toEqual(existingRiffs);
         });
     });
 
     describe("updateRiff", () => {
         it("should update an existing riff", async () => {
-            const existingRiffs = [savedSampleRiff];
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: existingRiffs,
-            });
+            const existingRiffs = [savedMockRiff];
+            const video = {
+                ...mockVideo,
+                riffs: existingRiffs,
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
 
             const updatedRiff: SavedRiff = {
-                ...savedSampleRiff,
+                ...savedMockRiff,
                 name: "Updated riff name",
                 time: 30,
             };
@@ -161,15 +309,21 @@ describe("ChromeStorageRiffsRepository", () => {
             const result = await repository.updateRiff(videoId, updatedRiff);
 
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
-                [`riffs_${videoId}`]: [updatedRiff],
+                [videoKey(videoId)]: {
+                    ...video,
+                    riffs: [updatedRiff],
+                    updatedAt: expect.any(Date),
+                },
             });
             expect(result).toEqual([updatedRiff]);
         });
 
         it("should throw RiffNotFoundError when riff does not exist", async () => {
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: [],
-            });
+            const video = {
+                ...mockVideo,
+                riffs: [],
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
 
             const nonExistentRiff: SavedRiff = {
                 id: "nonexistent",
@@ -190,25 +344,35 @@ describe("ChromeStorageRiffsRepository", () => {
 
     describe("upsertRiff", () => {
         it("should add a new riff when given an unsaved riff", async () => {
-            mockChromeGet.mockResolvedValue({});
-            mockGenerateId.mockReturnValue(savedSampleRiff.id);
+            const video = {
+                ...mockVideo,
+                riffs: [],
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
+            mockGenerateId.mockReturnValue(savedMockRiff.id);
 
-            const result = await repository.upsertRiff(videoId, sampleRiff);
+            const result = await repository.upsertRiff(videoId, mockRiff);
 
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
-                [`riffs_${videoId}`]: [savedSampleRiff],
+                [videoKey(videoId)]: {
+                    ...video,
+                    riffs: [savedMockRiff],
+                    updatedAt: expect.any(Date),
+                },
             });
-            expect(result).toEqual([savedSampleRiff]);
+            expect(result).toEqual([savedMockRiff]);
         });
 
         it("should update an existing riff when given a saved riff", async () => {
-            const existingRiffs = [savedSampleRiff];
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: existingRiffs,
-            });
+            const existingRiffs = [savedMockRiff];
+            const video = {
+                ...mockVideo,
+                riffs: existingRiffs,
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
 
             const updatedRiff: SavedRiff = {
-                ...savedSampleRiff,
+                ...savedMockRiff,
                 name: "Updated riff name",
                 time: 30,
             };
@@ -216,16 +380,22 @@ describe("ChromeStorageRiffsRepository", () => {
             const result = await repository.upsertRiff(videoId, updatedRiff);
 
             expect(chrome.storage.local.set).toHaveBeenCalledWith({
-                [`riffs_${videoId}`]: [updatedRiff],
+                [videoKey(videoId)]: {
+                    ...video,
+                    riffs: [updatedRiff],
+                    updatedAt: expect.any(Date),
+                },
             });
 
             expect(result).toEqual([updatedRiff]);
         });
 
         it("should throw RiffNotFoundError when updating non-existent saved riff", async () => {
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: [],
-            });
+            const video = {
+                ...mockVideo,
+                riffs: [],
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
 
             const nonExistentRiff: SavedRiff = {
                 id: "nonexistent",
@@ -244,13 +414,15 @@ describe("ChromeStorageRiffsRepository", () => {
         });
 
         it("should throw DuplicateHotkeyError when adding new riff with existing hotkey", async () => {
-            const existingRiffs = [savedSampleRiff];
-            mockChromeGet.mockResolvedValue({
-                [`riffs_${videoId}`]: existingRiffs,
-            });
+            const existingRiffs = [savedMockRiff];
+            const video = {
+                ...mockVideo,
+                riffs: existingRiffs,
+            };
+            mockChromeGet.mockResolvedValue({ [videoKey(video.id)]: video });
 
             const duplicateRiff: Riff = {
-                hotkey: savedSampleRiff.hotkey,
+                hotkey: savedMockRiff.hotkey,
                 name: "Another riff",
                 time: 30,
             };
