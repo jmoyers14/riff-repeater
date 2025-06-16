@@ -27,6 +27,11 @@ export class VideoNotFoundError extends Error {
 }
 
 export class ChromeStorageRiffsRepository implements RiffsRepositroy {
+    private videoKeyPrefix = "video";
+    private videoKey(videoId: string): string {
+        return `${this.videoKeyPrefix}:${videoId}`;
+    }
+
     private createSavedVideo(video: Video): SavedVideo {
         return {
             ...video,
@@ -72,18 +77,19 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
                 ...existingVideo,
                 ...video,
                 riffs,
+                createdDate: existingVideo.createdDate,
                 updatedAt: new Date(),
             };
 
             await chrome.storage.local.set({
-                [video.id]: updatedVideo,
+                [this.videoKey(video.id)]: updatedVideo,
             });
             return updatedVideo;
         }
 
         const savedVideo = this.createSavedVideo(video);
         await chrome.storage.local.set({
-            [video.id]: savedVideo,
+            [this.videoKey(video.id)]: savedVideo,
         });
         return savedVideo;
     }
@@ -109,13 +115,19 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
     }
 
     async getRiffs(videoId: string): Promise<SavedRiff[]> {
-        const result = await chrome.storage.local.get(videoId);
-        return result[videoId]?.riffs ?? [];
+        const result = await chrome.storage.local.get(this.videoKey(videoId));
+        return result[this.videoKey(videoId)]?.riffs ?? [];
     }
 
     async getVideo(videoId: string): Promise<SavedVideo | null> {
-        const result = await chrome.storage.local.get(videoId);
-        return (result as SavedVideo) || null;
+        const videoKey = this.videoKey(videoId);
+        const result = await chrome.storage.local.get(videoKey);
+        return result[videoKey] || null;
+    }
+
+    async getVideos(): Promise<SavedVideo[]> {
+        const result = await chrome.storage.local.get();
+        return Object.values(result) as SavedVideo[];
     }
 
     async updateRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff[]> {
@@ -145,7 +157,7 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         };
 
         await chrome.storage.local.set({
-            [video.id]: updatedVideo,
+            [this.videoKey(video.id)]: updatedVideo,
         });
         return updatedVideo;
     }

@@ -3,14 +3,9 @@ import { h, render } from "preact";
 import { useState, useEffect } from "preact/hooks";
 import { css } from "goober";
 import { colors, fontFamilies } from "../theme";
-
-interface VideoItem {
-    id: string;
-    title: string;
-    thumbnail: string;
-    timestamp: number;
-    url: string;
-}
+import { ChromeStorageRiffsRepository } from "../riffsRepository/chromeStorageRiffsRepository";
+import { RiffsRepositroy } from "../riffsRepository/riffsRepository";
+import { SavedVideo } from "../types";
 
 const $popup = css({
     display: "flex",
@@ -162,106 +157,10 @@ const $footerLink = css({
 
 interface PopupProps {}
 
-export const testVideos = [
-    {
-        id: "dQw4w9WgXcQ",
-        title: "Rick Astley - Never Gonna Give You Up (Official Music Video)",
-        thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-        timestamp: 1619712450000, // April 29, 2021
-        url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        hotkeys: {
-            "1": { timestamp: 43, label: "Chorus start" },
-            "2": { timestamp: 73, label: "Second verse" },
-            "3": { timestamp: 118, label: "Bridge" },
-        },
-    },
-    {
-        id: "9bZkp7q19f0",
-        title: "PSY - GANGNAM STYLE(강남스타일) M/V",
-        thumbnail: "https://i.ytimg.com/vi/9bZkp7q19f0/mqdefault.jpg",
-        timestamp: 1628611250000, // August 10, 2021
-        url: "https://www.youtube.com/watch?v=9bZkp7q19f0",
-        hotkeys: {
-            q: { timestamp: 71, label: "Main dance" },
-            w: { timestamp: 95, label: "Elevator scene" },
-        },
-    },
-    {
-        id: "JGwWNGJdvx8",
-        title: "Ed Sheeran - Shape of You (Official Music Video)",
-        thumbnail: "https://i.ytimg.com/vi/JGwWNGJdvx8/mqdefault.jpg",
-        timestamp: 1645785650000, // February 25, 2022
-        url: "https://www.youtube.com/watch?v=JGwWNGJdvx8",
-        hotkeys: {
-            a: { timestamp: 37, label: "First chorus" },
-            s: { timestamp: 98, label: "Boxing scene" },
-            d: { timestamp: 156, label: "End sequence" },
-        },
-    },
-    {
-        id: "kJQP7kiw5Fk",
-        title: "Luis Fonsi - Despacito ft. Daddy Yankee",
-        thumbnail: "https://i.ytimg.com/vi/kJQP7kiw5Fk/mqdefault.jpg",
-        timestamp: 1655123250000, // June 13, 2022
-        url: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
-        hotkeys: {
-            z: { timestamp: 52, label: "First chorus" },
-            x: { timestamp: 111, label: "Beach scene" },
-            c: { timestamp: 170, label: "Bridge" },
-        },
-    },
-    {
-        id: "RgKAFK5djSk",
-        title: "Wiz Khalifa - See You Again ft. Charlie Puth [Official Video]",
-        thumbnail: "https://i.ytimg.com/vi/RgKAFK5djSk/mqdefault.jpg",
-        timestamp: 1672829850000, // January 4, 2023
-        url: "https://www.youtube.com/watch?v=RgKAFK5djSk",
-        hotkeys: {
-            r: { timestamp: 45, label: "Chorus" },
-            t: { timestamp: 121, label: "Wiz verse" },
-            y: { timestamp: 207, label: "Final scene" },
-        },
-    },
-    {
-        id: "QH2-TGUlwu4",
-        title: "Nyan Cat [original]",
-        thumbnail: "https://i.ytimg.com/vi/QH2-TGUlwu4/mqdefault.jpg",
-        timestamp: 1678433850000, // March 10, 2023
-        url: "https://www.youtube.com/watch?v=QH2-TGUlwu4",
-        hotkeys: {
-            "1": { timestamp: 10, label: "Rainbow part" },
-            "2": { timestamp: 30, label: "Still going" },
-            "3": { timestamp: 60, label: "One minute in" },
-        },
-    },
-    {
-        id: "fJ9rUzIMcZQ",
-        title: "Queen - Bohemian Rhapsody (Official Video)",
-        thumbnail: "https://i.ytimg.com/vi/fJ9rUzIMcZQ/mqdefault.jpg",
-        timestamp: 1683618450000, // May 9, 2023
-        url: "https://www.youtube.com/watch?v=fJ9rUzIMcZQ",
-        hotkeys: {
-            b: { timestamp: 48, label: "Mama, just killed a man" },
-            n: { timestamp: 178, label: "Rock section" },
-            m: { timestamp: 295, label: "Outro" },
-        },
-    },
-    {
-        id: "KQ6zr6kCPj8",
-        title: "LMFAO - Party Rock Anthem ft. Lauren Bennett, GoonRock",
-        thumbnail: "https://i.ytimg.com/vi/KQ6zr6kCPj8/mqdefault.jpg",
-        timestamp: 1688996450000, // July 10, 2023
-        url: "https://www.youtube.com/watch?v=KQ6zr6kCPj8",
-        hotkeys: {
-            f: { timestamp: 51, label: "Every day I'm shuffling" },
-            g: { timestamp: 95, label: "Shuffle dance" },
-            h: { timestamp: 227, label: "Final dance sequence" },
-        },
-    },
-];
+const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
 
 const Popup = ({}: PopupProps) => {
-    const [savedVideos, setSavedVideos] = useState<VideoItem[]>([]);
+    const [savedVideos, setSavedVideos] = useState<SavedVideo[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -269,9 +168,7 @@ const Popup = ({}: PopupProps) => {
         const loadSavedVideos = async () => {
             try {
                 setLoading(true);
-                //const result = await chrome.storage.sync.get("savedVideos");
-                //const videos = result.savedVideos || [];
-                const videos = testVideos;
+                const videos = await riffsRepository.getVideos();
                 setSavedVideos(videos);
             } catch (err) {
                 console.error("Failed to load saved videos:", err);
@@ -329,9 +226,9 @@ const Popup = ({}: PopupProps) => {
                                         {video.title}
                                     </h3>
                                     <div className={$videoMeta}>
-                                        {new Date(
+                                        {/*new Date(
                                             video.timestamp
-                                        ).toLocaleDateString()}
+                                        ).toLocaleDateString()*/}
                                     </div>
                                 </div>
                             </div>
