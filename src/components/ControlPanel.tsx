@@ -1,3 +1,4 @@
+import EventEmitter from "node:events";
 import { colors, fontFamilies } from "../theme";
 import { css } from "goober";
 import { getCurrentTime } from "../utils/videoPlayer";
@@ -59,8 +60,10 @@ const $riffsContainer = css({
 interface ControlPanelProps {
     videoId?: string;
     riffs: Record<string, SavedRiff>;
-    onSubmitRiff: (riff: Riff | SavedRiff, videoId: string) => Promise<void>;
     onDeleteRiff: (riff: SavedRiff, videoId: string) => Promise<void>;
+    onSubmitRiff: (riff: Riff | SavedRiff, videoId: string) => Promise<void>;
+    onDialogOpen?: () => void;
+    onDialogClose?: () => void;
 }
 
 export const ControlPanel = (props: ControlPanelProps) => {
@@ -68,13 +71,38 @@ export const ControlPanel = (props: ControlPanelProps) => {
         Partial<SavedRiff> | undefined
     >(undefined);
 
-    const { onSubmitRiff, onDeleteRiff, riffs, videoId } = props;
+    const {
+        onDeleteRiff,
+        onDialogClose,
+        onDialogOpen,
+        onSubmitRiff,
+        riffs,
+        videoId,
+    } = props;
+
+    const openDialog = (riff: Partial<SavedRiff>) => {
+        setSelectedRiff(riff);
+        if (onDialogOpen) {
+            onDialogOpen();
+        }
+    };
+
+    const closeDialog = () => {
+        setSelectedRiff(undefined);
+        if (onDialogClose) {
+            onDialogClose();
+        }
+    };
 
     const handleAddRiff = () => {
         const newRiff: Partial<SavedRiff> = {
             time: getCurrentTime() ?? 0,
         };
-        setSelectedRiff(newRiff);
+        openDialog(newRiff);
+    };
+
+    const handleCancel = () => {
+        closeDialog();
     };
 
     const handleDeleteRiff = async (riff: SavedRiff) => {
@@ -82,11 +110,11 @@ export const ControlPanel = (props: ControlPanelProps) => {
             return;
         }
         onDeleteRiff(riff, videoId);
-        setSelectedRiff(undefined);
+        closeDialog();
     };
 
     const handleEditRiff = async (riff: SavedRiff) => {
-        setSelectedRiff(riff);
+        openDialog(riff);
     };
 
     const handleSubmitRiff = async (riff: Riff | SavedRiff) => {
@@ -94,7 +122,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
             return;
         }
         await onSubmitRiff(riff, videoId);
-        setSelectedRiff(undefined);
+        closeDialog();
     };
 
     const sortAsc = (riffA: SavedRiff, riffB: SavedRiff) => {
@@ -126,7 +154,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
             {selectedRiff && (
                 <RiffDialog
                     initialValues={selectedRiff}
-                    onCancel={() => setSelectedRiff(undefined)}
+                    onCancel={handleCancel}
                     onDelete={handleDeleteRiff}
                     onSubmit={handleSubmitRiff}
                 />
