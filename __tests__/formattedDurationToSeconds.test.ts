@@ -15,6 +15,7 @@ describe("formattedDurationToSeconds", () => {
         expect(formattedDurationToSeconds("01:30")).toBe(90);
         expect(formattedDurationToSeconds("01:90")).toBe(150);
         expect(formattedDurationToSeconds("5:00")).toBe(300);
+        expect(formattedDurationToSeconds("16:30")).toBe(990);
     });
 
     test("parses hours:minutes:seconds format", () => {

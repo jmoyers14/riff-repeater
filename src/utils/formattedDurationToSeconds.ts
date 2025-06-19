@@ -23,7 +23,7 @@ export const formattedDurationToSeconds = (
         });
     }
 
-    const matchMinutes = formattedDuration.match(/^(\d){1,2}:(\d\d)$/);
+    const matchMinutes = formattedDuration.match(/^(\d{1,2}):(\d\d)$/);
     if (matchMinutes) {
         const [_, minutes, seconds] = matchMinutes;
         return timeToSeconds({
