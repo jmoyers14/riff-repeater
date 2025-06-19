@@ -18,7 +18,6 @@ export const jumpToTime = (time: number) => {
 };
 
 export const getCurrentTime = (): number | null => {
-    console.log("Get Current Time");
     const video = getVideoPlayer();
     if (!video) {
         return null;

@@ -63,6 +63,8 @@ const renderControlPanel = (videoId: string | undefined) => {
             videoId={videoId}
             riffs={riffs}
             onDeleteRiff={handleDeleteRiff}
+            onDialogClose={onDialogClose}
+            onDialogOpen={onDialogOpen}
             onSubmitRiff={handleSubmitRiff}
         />,
         rootContainer
@@ -95,12 +97,23 @@ const init = async () => {
 
 window.addEventListener("load", init);
 
+let keydownEnabled = true;
+
+const onDialogClose = () => {
+    keydownEnabled = true;
+};
+
+const onDialogOpen = () => {
+    keydownEnabled = false;
+};
+
 document.addEventListener("keydown", (event) => {
-    console.log(`keydown: ${event.key}`);
+    if (!keydownEnabled) {
+        return;
+    }
     const riff = riffs[event.key];
 
     if (!riff) {
-        console.log(`no event found for ${event.key}`);
         return;
     }
 
