@@ -13,9 +13,6 @@
             "js": ["content.js"]
         }
     ],
-    "background": {
-        "service_worker": "background.js"
-    },
     "web_accessible_resources": [
         {
             "resources": ["assets/*.svg", "assets/images/*"],

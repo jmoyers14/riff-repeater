@@ -10,7 +10,6 @@ export default {
     mode: "development",
     devtool: "inline-source-map",
     entry: {
-        background: "./src/background.ts",
         content: "./src/content.tsx",
         popup: "./src/popup/popup.tsx",
     },
