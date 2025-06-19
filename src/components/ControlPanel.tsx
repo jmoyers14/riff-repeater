@@ -1,4 +1,3 @@
-import EventEmitter from "node:events";
 import { colors, fontFamilies } from "../theme";
 import { css } from "goober";
 import { getCurrentTime } from "../utils/videoPlayer";
