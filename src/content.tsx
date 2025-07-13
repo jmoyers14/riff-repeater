@@ -14,7 +14,7 @@ import { QUICK_ADD_RIFF } from "./constants/hotkeys";
 
 setup(h);
 
-const ROOT_ID = "yt-practice-root";
+const ROOT_ID = "riff-repeater-practice-root";
 const ABOVE_THE_FOLD_SELECTOR = "#above-the-fold";
 
 const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
@@ -121,20 +121,22 @@ const init = async () => {
     const videoId = urlParams.get("v") ?? undefined;
     console.log("loading video", videoId);
 
-    await waitForElement(ABOVE_THE_FOLD_SELECTOR);
+    const rootContainerSelector = ABOVE_THE_FOLD_SELECTOR;
+
+    await waitForElement(rootContainerSelector);
 
     if (videoId) {
         await loadRiffs(videoId);
     }
 
-    const playerContainer = document.querySelector(ABOVE_THE_FOLD_SELECTOR);
+    const playerContainer = document.querySelector(rootContainerSelector);
     if (!playerContainer || !playerContainer.parentNode) {
         console.log("Player container not found");
         return;
     }
 
     const root = initializeRootContainer();
-    playerContainer.parentNode.insertBefore(root, playerContainer.nextSibling);
+    playerContainer.insertBefore(root, playerContainer.firstChild);
     renderControlPanel(videoId);
 };
 
