@@ -1,13 +1,16 @@
 import { extractVideoInfo } from "./utils/extractVideoInfo";
+import { getCurrentTime } from "./utils/videoPlayer";
 import { groupRiffsByHotkey } from "./utils/groupRiffsByHotkey";
 import { h, render } from "preact";
 import { jumpToTime } from "./utils/videoPlayer";
 import { setup } from "goober";
+import { suggestAvailableKey } from "./utils/suggestAvailablekey";
 import { waitForElement } from "./utils/waitForElement";
 import { ChromeStorageRiffsRepository } from "./riffsRepository/chromeStorageRiffsRepository";
 import { ControlPanel } from "./components/ControlPanel";
 import { Riff, SavedRiff, Video } from "./types";
 import { RiffsRepositroy } from "./riffsRepository/riffsRepository";
+import { QUICK_ADD_RIFF } from "./constants/hotkeys";
 
 setup(h);
 
@@ -27,6 +30,46 @@ const loadRiffs = async (videoId: string) => {
     } catch (error) {
         console.error("Error loading riffs:", error);
     }
+};
+
+const handleQuickAddRiff = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoId = urlParams.get("v") ?? undefined;
+    if (!videoId) {
+        return;
+    }
+
+    let video = await riffsRepository.getVideo(videoId);
+    if (!video) {
+        const videoInfo = extractVideoInfo(videoId);
+        video = await riffsRepository.addVideo({ ...videoInfo, riffs: [] });
+    }
+
+    const usedKeys = video.riffs.map((riff) => riff.hotkey);
+
+    const name = `Riff ${video.riffs.length + 1}`;
+
+    const hotkey = suggestAvailableKey(usedKeys);
+    if (!hotkey) {
+        console.warn("Cannot create riff: All available hotkeys are in use.");
+        return;
+    }
+
+    const time = getCurrentTime();
+    if (!time) {
+        console.warn(
+            "Cannot create riff: Unable to get current video playback time."
+        );
+        return;
+    }
+    const riff: Riff = {
+        name,
+        time,
+        hotkey,
+    };
+    const updatedRiffs = await riffsRepository.upsertRiff(videoId, riff);
+    riffs = groupRiffsByHotkey(updatedRiffs);
+    renderControlPanel(videoId);
 };
 
 const handleSubmitRiff = async (riff: Riff | SavedRiff, videoId: string) => {
@@ -107,10 +150,16 @@ const onDialogOpen = () => {
     keydownEnabled = false;
 };
 
-document.addEventListener("keydown", (event) => {
+document.addEventListener("keydown", async (event) => {
     if (!keydownEnabled) {
         return;
     }
+
+    if (event.key === QUICK_ADD_RIFF) {
+        await handleQuickAddRiff();
+        return;
+    }
+
     const riff = riffs[event.key];
 
     if (!riff) {
