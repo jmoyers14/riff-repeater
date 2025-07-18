@@ -36,7 +36,7 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         return {
             ...video,
             createdDate: new Date(),
-            updatedAt: new Date(),
+            modifiedDate: new Date(),
         };
     }
 
@@ -44,6 +44,22 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
         return {
             ...riff,
             id: generateId(),
+        };
+    }
+
+    private serializeVideo(video: SavedVideo): any {
+        return {
+            ...video,
+            createdDate: video.createdDate.toISOString(),
+            modifiedDate: video.modifiedDate.toISOString(),
+        };
+    }
+
+    private deserializeVideo(data: any): SavedVideo {
+        return {
+            ...data,
+            createdDate: new Date(data.createdDate),
+            modifiedDate: new Date(data.modifiedDate),
         };
     }
 
@@ -78,18 +94,18 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
                 ...video,
                 riffs,
                 createdDate: existingVideo.createdDate,
-                updatedAt: new Date(),
+                modifiedDate: new Date(),
             };
 
             await chrome.storage.local.set({
-                [this.videoKey(video.id)]: updatedVideo,
+                [this.videoKey(video.id)]: this.serializeVideo(updatedVideo),
             });
             return updatedVideo;
         }
 
         const savedVideo = this.createSavedVideo(video);
         await chrome.storage.local.set({
-            [this.videoKey(video.id)]: savedVideo,
+            [this.videoKey(video.id)]: this.serializeVideo(savedVideo),
         });
         return savedVideo;
     }
@@ -116,20 +132,22 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
 
     async getRiffs(videoId: string): Promise<SavedRiff[]> {
         const result = await chrome.storage.local.get(this.videoKey(videoId));
-        return result[this.videoKey(videoId)]?.riffs ?? [];
+        const data = result[this.videoKey(videoId)];
+        return data ? this.deserializeVideo(data).riffs : [];
     }
 
     async getVideo(videoId: string): Promise<SavedVideo | null> {
         const videoKey = this.videoKey(videoId);
         const result = await chrome.storage.local.get(videoKey);
-        return result[videoKey] || null;
+        const data = result[videoKey];
+        return data ? this.deserializeVideo(data) : null;
     }
 
     async getVideos(): Promise<SavedVideo[]> {
         const result = await chrome.storage.local.get();
         return Object.entries(result)
             .filter(([key]) => key.startsWith(this.videoKeyPrefix + ":"))
-            .map(([, value]) => value) as SavedVideo[];
+            .map(([, value]) => this.deserializeVideo(value));
     }
 
     async updateRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff[]> {
@@ -155,11 +173,11 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
 
         const updatedVideo = {
             ...video,
-            updatedAt: new Date(),
+            modifiedDate: new Date(),
         };
 
         await chrome.storage.local.set({
-            [this.videoKey(video.id)]: updatedVideo,
+            [this.videoKey(video.id)]: this.serializeVideo(updatedVideo),
         });
         return updatedVideo;
     }

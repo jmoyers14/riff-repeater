@@ -8,7 +8,7 @@ export type Video = {
 
 export type SavedVideo = {
     createdDate: Date;
-    updatedAt: Date;
+    modifiedDate: Date;
 } & Video;
 
 export type Riff = {
