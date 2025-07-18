@@ -155,8 +155,6 @@ const init = async () => {
     const controlPanelHidden = await settingsRepository.getControlPanelHidden();
     shouldRenderControlPanel = !controlPanelHidden;
 
-    console.log("should render panel", shouldRenderControlPanel);
-
     const root = initializeRootContainer();
     playerContainer.insertBefore(root, playerContainer.firstChild);
     renderControlPanel(videoId);
