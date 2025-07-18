@@ -7,10 +7,12 @@ import { setup } from "goober";
 import { suggestAvailableKey } from "./utils/suggestAvailablekey";
 import { waitForElement } from "./utils/waitForElement";
 import { ChromeStorageRiffsRepository } from "./riffsRepository/chromeStorageRiffsRepository";
+import { ChromeStorageSettingsRepository } from "./settingsRepository/chromeStorageSettingsRepository";
 import { ControlPanel } from "./components/ControlPanel";
-import { Riff, SavedRiff, Video } from "./types";
+import { Riff, SavedRiff } from "./types";
 import { RiffsRepositroy } from "./riffsRepository/riffsRepository";
 import { QUICK_ADD_RIFF } from "./constants/hotkeys";
+import { SettingsRepository } from "./settingsRepository/settingsRepository";
 
 setup(h);
 
@@ -18,10 +20,22 @@ const ROOT_ID = "riff-repeater-practice-root";
 const ABOVE_THE_FOLD_SELECTOR = "#above-the-fold";
 
 const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
+const settingsRepository: SettingsRepository =
+    new ChromeStorageSettingsRepository();
+
+// Listen for control panel visibility changes from popup
+settingsRepository.onControlPanelHiddenChange((hidden) => {
+    shouldRenderControlPanel = !hidden;
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoId = urlParams.get("v") ?? undefined;
+    renderControlPanel(videoId);
+});
 
 let riffs: Record<string, SavedRiff> = {};
 
 let rootContainer: HTMLDivElement | null = null;
+
+let shouldRenderControlPanel = true;
 
 const loadRiffs = async (videoId: string) => {
     try {
@@ -101,17 +115,20 @@ const renderControlPanel = (videoId: string | undefined) => {
     if (!rootContainer) {
         return;
     }
-    render(
+
+    const controlPanel = shouldRenderControlPanel ? (
         <ControlPanel
             videoId={videoId}
             riffs={riffs}
             onDeleteRiff={handleDeleteRiff}
-            onDialogClose={onDialogClose}
-            onDialogOpen={onDialogOpen}
+            onDialogClose={handleDialogClose}
+            onDialogOpen={handleDialogOpen}
+            onHideControlPanel={handleHideControlPanel}
             onSubmitRiff={handleSubmitRiff}
-        />,
-        rootContainer
-    );
+        />
+    ) : null;
+
+    render(controlPanel, rootContainer);
 };
 
 const init = async () => {
@@ -135,6 +152,11 @@ const init = async () => {
         return;
     }
 
+    const controlPanelHidden = await settingsRepository.getControlPanelHidden();
+    shouldRenderControlPanel = !controlPanelHidden;
+
+    console.log("should render panel", shouldRenderControlPanel);
+
     const root = initializeRootContainer();
     playerContainer.insertBefore(root, playerContainer.firstChild);
     renderControlPanel(videoId);
@@ -144,12 +166,18 @@ window.addEventListener("load", init);
 
 let keydownEnabled = true;
 
-const onDialogClose = () => {
+const handleDialogClose = () => {
     keydownEnabled = true;
 };
 
-const onDialogOpen = () => {
+const handleDialogOpen = () => {
     keydownEnabled = false;
+};
+
+const handleHideControlPanel = async (videoId: string) => {
+    shouldRenderControlPanel = !shouldRenderControlPanel;
+    await settingsRepository.setControlPanelHidden(true);
+    renderControlPanel(videoId);
 };
 
 document.addEventListener("keydown", async (event) => {

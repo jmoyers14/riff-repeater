@@ -1,4 +1,3 @@
-// popup.tsx
 import { h, render } from "preact";
 import { useState, useEffect } from "preact/hooks";
 import { css } from "goober";
@@ -6,6 +5,10 @@ import { colors, fontFamilies } from "../theme";
 import { ChromeStorageRiffsRepository } from "../riffsRepository/chromeStorageRiffsRepository";
 import { RiffsRepositroy } from "../riffsRepository/riffsRepository";
 import { SavedVideo } from "../types";
+import { ChromeStorageSettingsRepository } from "../settingsRepository/chromeStorageSettingsRepository";
+import { SettingsRepository } from "../settingsRepository/settingsRepository";
+import { IconButton } from "../components/IconButton";
+import "../assets/eye.svg";
 
 const $popup = css({
     display: "flex",
@@ -23,6 +26,14 @@ const $header = css({
     backgroundColor: colors.sapphire,
     color: "white",
     borderBottom: `1px solid ${colors.overlay2}`,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+});
+
+const $headerContent = css({
+    display: "flex",
+    flexDirection: "column",
 });
 
 const $headerTitle = css({
@@ -158,6 +169,10 @@ const $footerLink = css({
 interface PopupProps {}
 
 const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
+const settingsRepository: SettingsRepository =
+    new ChromeStorageSettingsRepository();
+
+const eyeSvg = chrome.runtime.getURL("assets/eye.svg");
 
 const Popup = ({}: PopupProps) => {
     const [savedVideos, setSavedVideos] = useState<SavedVideo[]>([]);
@@ -189,8 +204,22 @@ const Popup = ({}: PopupProps) => {
     return (
         <div className={$popup}>
             <header className={$header}>
-                <h1 className={$headerTitle}>Riff Repeater</h1>
-                <p className={$subtitle}>Your saved YouTube practice videos</p>
+                <div className={$headerContent}>
+                    <h1 className={$headerTitle}>Riff Repeater</h1>
+                    <p className={$subtitle}>
+                        Your saved YouTube practice videos
+                    </p>
+                </div>
+                <IconButton
+                    src={eyeSvg}
+                    alt="Show UI"
+                    tooltip="Show Riff Repeater on current tab"
+                    onClick={() =>
+                        settingsRepository.setControlPanelHidden(false)
+                    }
+                    filter="invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%)"
+                    hoverFilter="invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(100%)"
+                />
             </header>
 
             <div className={$content}>

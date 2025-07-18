@@ -6,9 +6,12 @@ import { useState } from "preact/hooks";
 import { RiffDialog } from "./RiffDialog";
 import { Riff, SavedRiff } from "../types";
 import { RiffItem } from "./RiffItem";
+import { IconButton } from "./IconButton";
 import "../assets/plus-circle.svg";
+import "../assets/eye-off.svg";
 
 const addSvg = chrome.runtime.getURL("assets/plus-circle.svg");
+const hideSvg = chrome.runtime.getURL("assets/eye-off.svg");
 
 const $panel = css({
     border: `2px solid ${colors.sapphire}`,
@@ -33,23 +36,11 @@ const $title = css({
     fontFamily: fontFamilies.sans,
 });
 
-const $addButton = css({
-    backgroundColor: "transparent",
-    border: "none",
-    margin: "0",
-    cursor: "pointer",
-    padding: "0",
+
+const $buttonGroup = css({
     display: "flex",
     alignItems: "center",
-});
-
-const $addButtonImg = css({
-    width: "24px",
-    height: "24px",
-    filter: "invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg) brightness(96%) contrast(89%)",
-    ":hover": {
-        filter: "invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(95%)",
-    },
+    gap: "16px",
 });
 
 const $riffsContainer = css({
@@ -61,6 +52,7 @@ interface ControlPanelProps {
     riffs: Record<string, SavedRiff>;
     onDeleteRiff: (riff: SavedRiff, videoId: string) => Promise<void>;
     onSubmitRiff: (riff: Riff | SavedRiff, videoId: string) => Promise<void>;
+    onHideControlPanel: (videoId: string) => void;
     onDialogOpen?: () => void;
     onDialogClose?: () => void;
 }
@@ -74,6 +66,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
         onDeleteRiff,
         onDialogClose,
         onDialogOpen,
+        onHideControlPanel,
         onSubmitRiff,
         riffs,
         videoId,
@@ -116,6 +109,13 @@ export const ControlPanel = (props: ControlPanelProps) => {
         openDialog(riff);
     };
 
+    const handleHideControlPanel = () => {
+        if (!videoId) {
+            return;
+        }
+        onHideControlPanel(videoId);
+    };
+
     const handleSubmitRiff = async (riff: Riff | SavedRiff) => {
         if (!videoId) {
             return;
@@ -132,9 +132,24 @@ export const ControlPanel = (props: ControlPanelProps) => {
         <div className={$panel}>
             <div className={$panelHeader}>
                 <h1 className={$title}>Riff Reapeter</h1>
-                <button className={$addButton} onClick={handleAddRiff}>
-                    <img className={$addButtonImg} src={addSvg} alt="Add" />
-                </button>
+                <div className={$buttonGroup}>
+                    <IconButton
+                        src={addSvg}
+                        alt="Add"
+                        tooltip="Add new riff at current time"
+                        onClick={handleAddRiff}
+                        filter="invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg) brightness(96%) contrast(89%)"
+                        hoverFilter="invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(95%)"
+                    />
+                    <IconButton
+                        src={hideSvg}
+                        alt="Hide"
+                        tooltip="Hide Riff Repeater"
+                        onClick={handleHideControlPanel}
+                        filter="invert(60%) sepia(8%) saturate(464%) hue-rotate(202deg) brightness(99%) contrast(92%)"
+                        hoverFilter="invert(65%) sepia(12%) saturate(464%) hue-rotate(202deg) brightness(95%) contrast(88%)"
+                    />
+                </div>
             </div>
             <div className={$riffsContainer}>
                 {Object.values(riffs)
