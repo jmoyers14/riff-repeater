@@ -1,6 +1,7 @@
 import {
     ALPHABETICAL_KEYS,
     PREFERRED_KEYS,
+    QUICK_ADD_RIFF,
     YOUTUBE_KEYBOARD_SHORTCUTS,
 } from "../constants/hotkeys";
 
@@ -8,6 +9,7 @@ export const suggestAvailableKey = (
     userChosenKeys: string[]
 ): string | null => {
     const unavailableKeys = new Set([
+        ...QUICK_ADD_RIFF,
         ...YOUTUBE_KEYBOARD_SHORTCUTS,
         ...userChosenKeys,
     ]);
