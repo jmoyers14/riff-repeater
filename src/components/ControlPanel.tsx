@@ -35,7 +35,7 @@ const $title = css({
     fontFamily: fontFamilies.sans,
 });
 
-const $addButton = css({
+const $button = css({
     backgroundColor: "transparent",
     border: "none",
     margin: "0",
@@ -52,6 +52,21 @@ const $addButtonImg = css({
     ":hover": {
         filter: "invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(95%)",
     },
+});
+
+const $hideButtonImg = css({
+    width: "24px",
+    height: "24px",
+    filter: "invert(60%) sepia(8%) saturate(464%) hue-rotate(202deg) brightness(99%) contrast(92%)",
+    ":hover": {
+        filter: "invert(65%) sepia(12%) saturate(464%) hue-rotate(202deg) brightness(95%) contrast(88%)",
+    },
+});
+
+const $buttonGroup = css({
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
 });
 
 const $riffsContainer = css({
@@ -143,12 +158,21 @@ export const ControlPanel = (props: ControlPanelProps) => {
         <div className={$panel}>
             <div className={$panelHeader}>
                 <h1 className={$title}>Riff Reapeter</h1>
-                <button className={$addButton} onClick={handleHideControlPanel}>
-                    <img className={$addButtonImg} src={hideSvg} alt="Hide" />
-                </button>
-                <button className={$addButton} onClick={handleAddRiff}>
-                    <img className={$addButtonImg} src={addSvg} alt="Add" />
-                </button>
+                <div className={$buttonGroup}>
+                    <button className={$button} onClick={handleAddRiff}>
+                        <img className={$addButtonImg} src={addSvg} alt="Add" />
+                    </button>
+                    <button
+                        className={$button}
+                        onClick={handleHideControlPanel}
+                    >
+                        <img
+                            className={$hideButtonImg}
+                            src={hideSvg}
+                            alt="Hide"
+                        />
+                    </button>
+                </div>
             </div>
             <div className={$riffsContainer}>
                 {Object.values(riffs)
