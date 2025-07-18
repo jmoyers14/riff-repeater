@@ -7,8 +7,10 @@ import { RiffDialog } from "./RiffDialog";
 import { Riff, SavedRiff } from "../types";
 import { RiffItem } from "./RiffItem";
 import "../assets/plus-circle.svg";
+import "../assets/eye-off.svg";
 
 const addSvg = chrome.runtime.getURL("assets/plus-circle.svg");
+const hideSvg = chrome.runtime.getURL("assets/eye-off.svg");
 
 const $panel = css({
     border: `2px solid ${colors.sapphire}`,
@@ -61,6 +63,7 @@ interface ControlPanelProps {
     riffs: Record<string, SavedRiff>;
     onDeleteRiff: (riff: SavedRiff, videoId: string) => Promise<void>;
     onSubmitRiff: (riff: Riff | SavedRiff, videoId: string) => Promise<void>;
+    onHideControlPanel: (videoId: string) => void;
     onDialogOpen?: () => void;
     onDialogClose?: () => void;
 }
@@ -74,6 +77,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
         onDeleteRiff,
         onDialogClose,
         onDialogOpen,
+        onHideControlPanel,
         onSubmitRiff,
         riffs,
         videoId,
@@ -116,6 +120,13 @@ export const ControlPanel = (props: ControlPanelProps) => {
         openDialog(riff);
     };
 
+    const handleHideControlPanel = () => {
+        if (!videoId) {
+            return;
+        }
+        onHideControlPanel(videoId);
+    };
+
     const handleSubmitRiff = async (riff: Riff | SavedRiff) => {
         if (!videoId) {
             return;
@@ -132,6 +143,9 @@ export const ControlPanel = (props: ControlPanelProps) => {
         <div className={$panel}>
             <div className={$panelHeader}>
                 <h1 className={$title}>Riff Reapeter</h1>
+                <button className={$addButton} onClick={handleHideControlPanel}>
+                    <img className={$addButtonImg} src={hideSvg} alt="Hide" />
+                </button>
                 <button className={$addButton} onClick={handleAddRiff}>
                     <img className={$addButtonImg} src={addSvg} alt="Add" />
                 </button>

@@ -127,7 +127,9 @@ export class ChromeStorageRiffsRepository implements RiffsRepositroy {
 
     async getVideos(): Promise<SavedVideo[]> {
         const result = await chrome.storage.local.get();
-        return Object.values(result) as SavedVideo[];
+        return Object.entries(result)
+            .filter(([key]) => key.startsWith(this.videoKeyPrefix + ":"))
+            .map(([, value]) => value) as SavedVideo[];
     }
 
     async updateRiff(videoId: string, riff: SavedRiff): Promise<SavedRiff[]> {
