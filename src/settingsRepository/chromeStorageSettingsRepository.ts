@@ -19,11 +19,23 @@ export class ChromeStorageSettingsRepository implements SettingsRepository {
     async getControlPanelHidden(): Promise<boolean> {
         const key = this.settingKey("controlPanelHidden");
         const result = await chrome.storage.local.get(key);
-        console.log("RESULT", result[key]);
-        console.log("typeof", result[key]);
         if (result[key] === undefined) {
             return false;
         }
         return result[key] as boolean;
+    }
+
+    onControlPanelHiddenChange(callback: (hidden: boolean) => void): void {
+        const key = this.settingKey("controlPanelHidden");
+
+        chrome.storage.onChanged.addListener((changes, areaName) => {
+            if (areaName !== "local" || !changes[key]) {
+                return;
+            }
+            const newValue = changes[key].newValue;
+            if (typeof newValue === "boolean") {
+                callback(newValue);
+            }
+        });
     }
 }

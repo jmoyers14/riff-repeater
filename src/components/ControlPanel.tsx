@@ -6,6 +6,7 @@ import { useState } from "preact/hooks";
 import { RiffDialog } from "./RiffDialog";
 import { Riff, SavedRiff } from "../types";
 import { RiffItem } from "./RiffItem";
+import { IconButton } from "./IconButton";
 import "../assets/plus-circle.svg";
 import "../assets/eye-off.svg";
 
@@ -35,33 +36,6 @@ const $title = css({
     fontFamily: fontFamilies.sans,
 });
 
-const $button = css({
-    backgroundColor: "transparent",
-    border: "none",
-    margin: "0",
-    cursor: "pointer",
-    padding: "0",
-    display: "flex",
-    alignItems: "center",
-});
-
-const $addButtonImg = css({
-    width: "24px",
-    height: "24px",
-    filter: "invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg) brightness(96%) contrast(89%)",
-    ":hover": {
-        filter: "invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(95%)",
-    },
-});
-
-const $hideButtonImg = css({
-    width: "24px",
-    height: "24px",
-    filter: "invert(60%) sepia(8%) saturate(464%) hue-rotate(202deg) brightness(99%) contrast(92%)",
-    ":hover": {
-        filter: "invert(65%) sepia(12%) saturate(464%) hue-rotate(202deg) brightness(95%) contrast(88%)",
-    },
-});
 
 const $buttonGroup = css({
     display: "flex",
@@ -159,19 +133,22 @@ export const ControlPanel = (props: ControlPanelProps) => {
             <div className={$panelHeader}>
                 <h1 className={$title}>Riff Reapeter</h1>
                 <div className={$buttonGroup}>
-                    <button className={$button} onClick={handleAddRiff}>
-                        <img className={$addButtonImg} src={addSvg} alt="Add" />
-                    </button>
-                    <button
-                        className={$button}
+                    <IconButton
+                        src={addSvg}
+                        alt="Add"
+                        tooltip="Add new riff at current time"
+                        onClick={handleAddRiff}
+                        filter="invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg) brightness(96%) contrast(89%)"
+                        hoverFilter="invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(95%)"
+                    />
+                    <IconButton
+                        src={hideSvg}
+                        alt="Hide"
+                        tooltip="Hide Riff Repeater"
                         onClick={handleHideControlPanel}
-                    >
-                        <img
-                            className={$hideButtonImg}
-                            src={hideSvg}
-                            alt="Hide"
-                        />
-                    </button>
+                        filter="invert(60%) sepia(8%) saturate(464%) hue-rotate(202deg) brightness(99%) contrast(92%)"
+                        hoverFilter="invert(65%) sepia(12%) saturate(464%) hue-rotate(202deg) brightness(95%) contrast(88%)"
+                    />
                 </div>
             </div>
             <div className={$riffsContainer}>

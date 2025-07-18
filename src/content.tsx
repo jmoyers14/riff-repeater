@@ -23,6 +23,14 @@ const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
 const settingsRepository: SettingsRepository =
     new ChromeStorageSettingsRepository();
 
+// Listen for control panel visibility changes from popup
+settingsRepository.onControlPanelHiddenChange((hidden) => {
+    shouldRenderControlPanel = !hidden;
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoId = urlParams.get("v") ?? undefined;
+    renderControlPanel(videoId);
+});
+
 let riffs: Record<string, SavedRiff> = {};
 
 let rootContainer: HTMLDivElement | null = null;
