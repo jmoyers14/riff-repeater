@@ -36,7 +36,6 @@ const $title = css({
     fontFamily: fontFamilies.sans,
 });
 
-
 const $buttonGroup = css({
     display: "flex",
     alignItems: "center",
@@ -136,7 +135,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
                     <IconButton
                         src={addSvg}
                         alt="Add"
-                        tooltip="Add new riff at current time"
+                        tooltip="(r) Add new riff at current time"
                         onClick={handleAddRiff}
                         filter="invert(48%) sepia(82%) saturate(463%) hue-rotate(71deg) brightness(96%) contrast(89%)"
                         hoverFilter="invert(48%) sepia(97%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(95%)"

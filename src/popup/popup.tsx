@@ -174,10 +174,16 @@ const settingsRepository: SettingsRepository =
 
 const eyeSvg = chrome.runtime.getURL("assets/eye.svg");
 
+const formatVideoDate = (video: SavedVideo): string => {
+    const date = video.modifiedDate || video.createdDate;
+    return date ? new Date(date).toLocaleDateString() : '';
+};
+
 const Popup = ({}: PopupProps) => {
     const [savedVideos, setSavedVideos] = useState<SavedVideo[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const showFooter = false;
 
     useEffect(() => {
         const loadSavedVideos = async () => {
@@ -255,9 +261,7 @@ const Popup = ({}: PopupProps) => {
                                         {video.title}
                                     </h3>
                                     <div className={$videoMeta}>
-                                        {/*new Date(
-                                            video.timestamp
-                                        ).toLocaleDateString()*/}
+                                        {formatVideoDate(video)}
                                     </div>
                                 </div>
                             </div>
@@ -266,18 +270,20 @@ const Popup = ({}: PopupProps) => {
                 )}
             </div>
 
-            <footer className={$footer}>
-                <a
-                    className={$footerLink}
-                    href="#"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        chrome.tabs.create({ url: "options.html" });
-                    }}
-                >
-                    Settings
-                </a>
-            </footer>
+            {showFooter && (
+                <footer className={$footer}>
+                    <a
+                        className={$footerLink}
+                        href="#"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            chrome.tabs.create({ url: "options.html" });
+                        }}
+                    >
+                        Settings
+                    </a>
+                </footer>
+            )}
         </div>
     );
 };

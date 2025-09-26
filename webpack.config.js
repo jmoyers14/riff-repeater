@@ -50,6 +50,7 @@ export default {
             patterns: [
                 { from: "src/manifest.json", to: "." },
                 { from: "src/popup/popup.html", to: "." },
+                { from: "src/assets/icon*.png", to: "assets/[name][ext]" },
             ],
         }),
     ],
