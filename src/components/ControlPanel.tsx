@@ -9,9 +9,11 @@ import { RiffItem } from "./RiffItem";
 import { IconButton } from "./IconButton";
 import "../assets/plus-circle.svg";
 import "../assets/eye-off.svg";
+import "../assets/inline-logo-white.jpg";
 
 const addSvg = chrome.runtime.getURL("assets/plus-circle.svg");
 const hideSvg = chrome.runtime.getURL("assets/eye-off.svg");
+const logoImg = chrome.runtime.getURL("assets/inline-logo-white.jpg");
 
 const $panel = css({
     border: `2px solid ${colors.sapphire}`,
@@ -34,6 +36,11 @@ const $title = css({
     fontSize: "1.8em",
     fontWeight: "bold",
     fontFamily: fontFamilies.sans,
+});
+
+const $logo = css({
+    height: "30px",
+    display: "block",
 });
 
 const $buttonGroup = css({
@@ -130,7 +137,7 @@ export const ControlPanel = (props: ControlPanelProps) => {
     return (
         <div className={$panel}>
             <div className={$panelHeader}>
-                <h1 className={$title}>Riff Reapeter</h1>
+                <img src={logoImg} alt="Riff Repeater" className={$logo} />
                 <div className={$buttonGroup}>
                     <IconButton
                         src={addSvg}

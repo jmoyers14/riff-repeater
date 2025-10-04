@@ -34,7 +34,7 @@ export default {
                 use: ["style-loader", "css-loader"],
             },
             {
-                test: /\.svg$/,
+                test: /\.(svg|jpg|jpeg|png)$/,
                 type: "asset/resource",
                 generator: {
                     filename: "assets/[name][ext]",
@@ -51,6 +51,7 @@ export default {
                 { from: "src/manifest.json", to: "." },
                 { from: "src/popup/popup.html", to: "." },
                 { from: "src/assets/icon*.png", to: "assets/[name][ext]" },
+                { from: "src/assets/*.jpg", to: "assets/[name][ext]" },
             ],
         }),
     ],
