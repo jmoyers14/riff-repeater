@@ -1,6 +1,7 @@
 import { colors, fontFamilies } from "../theme";
 import { css } from "goober";
 import { h } from "preact";
+import { jumpToTime } from "../utils/videoPlayer";
 import { SavedRiff } from "../types";
 import { formatTime } from "../utils/formatTime";
 import "../assets/edit.svg";
@@ -32,6 +33,7 @@ const $riffHotkey = css({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    cursor: "pointer",
 });
 
 const $riffName = css({
@@ -80,7 +82,9 @@ export const RiffItem = (props: RiffItemProps) => {
 
     return (
         <div className={$riffItemContainer}>
-            <span className={$riffHotkey}>{hotkey}</span>
+            <span className={$riffHotkey} onClick={() => jumpToTime(time)}>
+                {hotkey}
+            </span>
             <span className={$riffName}>{name}</span>
             <span className={$riffTimestamp}> {formatTime(time)}</span>
             <button
