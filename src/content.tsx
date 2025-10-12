@@ -125,6 +125,7 @@ const renderControlPanel = (videoId: string | undefined) => {
             onDialogOpen={handleDialogOpen}
             onHideControlPanel={handleHideControlPanel}
             onSubmitRiff={handleSubmitRiff}
+            onQuickAddRiff={handleQuickAddRiff}
         />
     ) : null;
 

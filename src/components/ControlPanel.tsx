@@ -61,6 +61,7 @@ interface ControlPanelProps {
     onHideControlPanel: (videoId: string) => void;
     onDialogOpen?: () => void;
     onDialogClose?: () => void;
+    onQuickAddRiff: () => Promise<void>;
 }
 
 export const ControlPanel = (props: ControlPanelProps) => {
@@ -93,10 +94,8 @@ export const ControlPanel = (props: ControlPanelProps) => {
     };
 
     const handleAddRiff = () => {
-        const newRiff: Partial<SavedRiff> = {
-            time: getCurrentTime() ?? 0,
-        };
-        openDialog(newRiff);
+        const { onQuickAddRiff } = props;
+        onQuickAddRiff();
     };
 
     const handleCancel = () => {
