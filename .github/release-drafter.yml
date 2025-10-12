@@ -1,0 +1,77 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+# Auto-label PRs based on branch names and titles
+autolabeler:
+  - label: "feature"
+    branch:
+      - "/^feature[/-].+/"
+      - "/^feat[/-].+/"
+    title:
+      - '/^feat(\(.+\))?:/i'
+      - '/^feature(\(.+\))?:/i'
+  - label: "fix"
+    branch:
+      - "/^fix[/-].+/"
+      - "/^bugfix[/-].+/"
+      - "/^hotfix[/-].+/"
+    title:
+      - '/^fix(\(.+\))?:/i'
+      - '/^bugfix(\(.+\))?:/i'
+  - label: "documentation"
+    branch:
+      - "/^docs?[/-].+/"
+    title:
+      - '/^docs(\(.+\))?:/i'
+    files:
+      - "*.md"
+      - "docs/**/*"
+  - label: "chore"
+    branch:
+      - "/^chore[/-].+/"
+      - "/^refactor[/-].+/"
+    title:
+      - '/^chore(\(.+\))?:/i'
+      - '/^refactor(\(.+\))?:/i'
+
+categories:
+  - title: "🚀 Features"
+    labels:
+      - "feature"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "fix"
+      - "bugfix"
+  - title: "🧰 Maintenance"
+    labels:
+      - "chore"
+  - title: "📚 Documentation"
+    labels:
+      - "documentation"
+
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "minor"
+      - "feature"
+  patch:
+    labels:
+      - "patch"
+      - "fix"
+      - "bugfix"
+  default: patch
+
+template: |
+  ## Changes
+
+  $CHANGES
+
+  ## Installation
+
+  Download the extension package from the assets below or install from the [Chrome Web Store](https://chrome.google.com/webstore/detail/jlllikemcgiipobbgjlledoojdlhhgjd).
