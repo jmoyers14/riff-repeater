@@ -50,6 +50,7 @@ export const YOUTUBE_KEYBOARD_SHORTCUTS = [
     "j",
     "l",
     "i",
+    "f",
     ".",
     ",",
     ">",
