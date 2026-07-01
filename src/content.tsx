@@ -13,6 +13,8 @@ import { Riff, SavedRiff } from "./types";
 import { RiffsRepositroy } from "./riffsRepository/riffsRepository";
 import { QUICK_ADD_RIFF } from "./constants/hotkeys";
 import { SettingsRepository } from "./settingsRepository/settingsRepository";
+import { capture } from "./analytics/analytics";
+import { isSavedRiff } from "./utils/isSavedRiff";
 
 setup(h);
 
@@ -83,17 +85,29 @@ const handleQuickAddRiff = async () => {
     };
     const updatedRiffs = await riffsRepository.upsertRiff(videoId, riff);
     riffs = groupRiffsByHotkey(updatedRiffs);
+    capture("riff_created", {
+        via: "quick_add",
+        video_id: videoId,
+        video_title: video.title,
+    });
     renderControlPanel(videoId);
 };
 
 const handleSubmitRiff = async (riff: Riff | SavedRiff, videoId: string) => {
-    const video = await riffsRepository.getVideo(videoId);
+    let video = await riffsRepository.getVideo(videoId);
     if (!video) {
         const videoInfo = extractVideoInfo(videoId);
-        await riffsRepository.addVideo({ ...videoInfo, riffs: [] });
+        video = await riffsRepository.addVideo({ ...videoInfo, riffs: [] });
     }
     const updatedRiffs = await riffsRepository.upsertRiff(videoId, riff);
     riffs = groupRiffsByHotkey(updatedRiffs);
+    if (!isSavedRiff(riff)) {
+        capture("riff_created", {
+            via: "dialog",
+            video_id: videoId,
+            video_title: video.title,
+        });
+    }
     renderControlPanel(videoId);
 };
 
@@ -138,6 +152,8 @@ const init = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const videoId = urlParams.get("v") ?? undefined;
     console.log("loading video", videoId);
+
+    capture("extension_loaded", { has_video: Boolean(videoId) });
 
     const rootContainerSelector = ABOVE_THE_FOLD_SELECTOR;
 
@@ -195,5 +211,6 @@ document.addEventListener("keydown", async (event) => {
         return;
     }
 
+    capture("riff_played");
     jumpToTime(riff.time);
 });
