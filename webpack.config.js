@@ -12,6 +12,7 @@ export default {
     entry: {
         content: "./src/content.tsx",
         popup: "./src/popup/popup.tsx",
+        background: "./src/background/background.ts",
     },
     output: {
         path: path.resolve(__dirname, "dist"),

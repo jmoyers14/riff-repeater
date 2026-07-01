@@ -1,6 +1,6 @@
 import { SettingsRepository } from "./settingsRepository";
 
-type SettingName = "controlPanelHidden";
+type SettingName = "controlPanelHidden" | "analyticsOptedOut";
 
 export class ChromeStorageSettingsRepository implements SettingsRepository {
     private settingKeyPrefix = "settings";
@@ -18,6 +18,23 @@ export class ChromeStorageSettingsRepository implements SettingsRepository {
 
     async getControlPanelHidden(): Promise<boolean> {
         const key = this.settingKey("controlPanelHidden");
+        const result = await chrome.storage.local.get(key);
+        if (result[key] === undefined) {
+            return false;
+        }
+        return result[key] as boolean;
+    }
+
+    async setAnalyticsOptedOut(optedOut: boolean): Promise<void> {
+        const key = this.settingKey("analyticsOptedOut");
+
+        await chrome.storage.local.set({
+            [key]: optedOut,
+        });
+    }
+
+    async getAnalyticsOptedOut(): Promise<boolean> {
+        const key = this.settingKey("analyticsOptedOut");
         const result = await chrome.storage.local.get(key);
         if (result[key] === undefined) {
             return false;

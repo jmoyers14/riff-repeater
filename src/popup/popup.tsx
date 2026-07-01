@@ -8,6 +8,7 @@ import { SavedVideo } from "../types";
 import { ChromeStorageSettingsRepository } from "../settingsRepository/chromeStorageSettingsRepository";
 import { SettingsRepository } from "../settingsRepository/settingsRepository";
 import { IconButton } from "../components/IconButton";
+import { capture } from "../analytics/analytics";
 import "../assets/eye.svg";
 
 const $popup = css({
@@ -166,6 +167,24 @@ const $footerLink = css({
     },
 });
 
+const $privacyFooter = css({
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "10px 16px",
+    borderTop: `1px solid ${colors.overlay0}`,
+    fontSize: "12px",
+    color: colors.subtext0,
+});
+
+const $privacyLabel = css({
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    cursor: "pointer",
+    userSelect: "none",
+});
+
 interface PopupProps {}
 
 const riffsRepository: RiffsRepositroy = new ChromeStorageRiffsRepository();
@@ -183,9 +202,12 @@ const Popup = ({}: PopupProps) => {
     const [savedVideos, setSavedVideos] = useState<SavedVideo[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean>(true);
     const showFooter = false;
 
     useEffect(() => {
+        capture("popup_opened");
+
         const loadSavedVideos = async () => {
             try {
                 setLoading(true);
@@ -199,8 +221,20 @@ const Popup = ({}: PopupProps) => {
             }
         };
 
+        const loadAnalyticsSetting = async () => {
+            const optedOut = await settingsRepository.getAnalyticsOptedOut();
+            setAnalyticsEnabled(!optedOut);
+        };
+
         loadSavedVideos();
+        loadAnalyticsSetting();
     }, []);
+
+    const toggleAnalytics = async () => {
+        const nextEnabled = !analyticsEnabled;
+        setAnalyticsEnabled(nextEnabled);
+        await settingsRepository.setAnalyticsOptedOut(!nextEnabled);
+    };
 
     const openVideo = (url: string) => {
         // Open the video URL in a new tab
@@ -268,6 +302,17 @@ const Popup = ({}: PopupProps) => {
                         ))}
                     </div>
                 )}
+            </div>
+
+            <div className={$privacyFooter}>
+                <label className={$privacyLabel}>
+                    <input
+                        type="checkbox"
+                        checked={analyticsEnabled}
+                        onChange={toggleAnalytics}
+                    />
+                    Share anonymous usage data
+                </label>
             </div>
 
             {showFooter && (
